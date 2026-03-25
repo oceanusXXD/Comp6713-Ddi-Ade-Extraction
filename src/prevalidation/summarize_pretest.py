@@ -41,7 +41,10 @@ def main() -> None:
         print("\nGOLD:")
         print(json.dumps(row["gold_relations"], ensure_ascii=False, indent=2))
         print("\nPRED:")
-        print(json.dumps(row["parsed_output"], ensure_ascii=False, indent=2) if row["parsed_output"] is not None else row["raw_output"])
+        if row["parsed_output"] is not None:
+            print(json.dumps(row["parsed_output"], ensure_ascii=False, indent=2))
+        else:
+            print(row["raw_output"])
 
 
 if __name__ == "__main__":
