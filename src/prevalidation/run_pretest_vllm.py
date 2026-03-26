@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -44,6 +45,8 @@ def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any
 
 def extract_json_list(text: str) -> Optional[List[Dict[str, Any]]]:
     text = text.strip()
+    # Remove <think>...</think> blocks if present
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
     try:
         parsed = json.loads(text)
         if isinstance(parsed, list):
@@ -74,15 +77,20 @@ def main() -> None:
     parser.add_argument("--input_path", type=str, default="data/merged_chatml_test.jsonl")
     parser.add_argument("--prompt_path", type=str, default="src/prevalidation/prompt.txt")
     parser.add_argument("--model_name", type=str, required=True)
-    parser.add_argument("--output_path", type=str, required=True)
+    parser.add_argument("--output_path", type=str, default=None)
     parser.add_argument("--limit", type=int, default=50)
     parser.add_argument("--temperature", type=float, default=0.0)
-    parser.add_argument("--max_new_tokens", type=int, default=256)
+    parser.add_argument("--max_new_tokens", type=int, default=2048)
     args = parser.parse_args()
 
     input_path = Path(args.input_path)
     prompt_path = Path(args.prompt_path)
-    output_path = Path(args.output_path)
+    
+    if args.output_path is None:
+        safe_name = args.model_name.replace("/", "_")
+        output_path = Path(f"results/{safe_name}_preds.jsonl")
+    else:
+        output_path = Path(args.output_path)
 
     rows = read_jsonl(input_path)
     if args.limit > 0:
@@ -98,6 +106,7 @@ def main() -> None:
         model=args.model_name,
         trust_remote_code=True,
         tensor_parallel_size=1,
+        max_model_len=8192,
     )
 
     sampling_params = SamplingParams(

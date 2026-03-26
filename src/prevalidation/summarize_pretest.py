@@ -59,16 +59,26 @@ def main() -> None:
     exact_match_acc = exact_match_count / total_samples if total_samples > 0 else 0.0
     json_valid_rate = json_valid_count / total_samples if total_samples > 0 else 0.0
 
-    print("=" * 80)
-    print(f"Prediction file: {args.pred_path}")
-    print(f"Total samples: {total_samples}")
-    print(f"JSON valid: {json_valid_count}/{total_samples} = {json_valid_rate:.2%}")
-    print(f"Exact match accuracy: {exact_match_count}/{total_samples} = {exact_match_acc:.2%}")
-    print(f"TP={tp}, FP={fp}, FN={fn}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall:    {recall:.4f}")
-    print(f"F1:        {f1:.4f}")
-    print("=" * 80)
+    report_lines = [
+        "=" * 80,
+        f"Prediction file: {args.pred_path}",
+        f"Total samples: {total_samples}",
+        f"JSON valid: {json_valid_count}/{total_samples} = {json_valid_rate:.2%}",
+        f"Exact match accuracy: {exact_match_count}/{total_samples} = {exact_match_acc:.2%}",
+        f"TP={tp}, FP={fp}, FN={fn}",
+        f"Precision: {precision:.4f}",
+        f"Recall:    {recall:.4f}",
+        f"F1:        {f1:.4f}",
+        "=" * 80,
+    ]
+    report_text = "\n".join(report_lines)
+    print(report_text)
+
+    pred_path_obj = Path(args.pred_path)
+    report_path = pred_path_obj.with_name(pred_path_obj.stem + "_metrics.txt")
+    with report_path.open("w", encoding="utf-8") as f:
+        f.write(report_text + "\n")
+    print(f"\n[INFO] Metrics report saved to: {report_path}")
 
     print("\nExamples of mismatched cases:")
     shown = 0
