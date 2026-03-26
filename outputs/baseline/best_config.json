@@ -1,0 +1,64 @@
+{
+  "ADE_TRIGGERS": [
+    "caused",
+    "cause",
+    "induced",
+    "induce",
+    "associated with",
+    "resulted in",
+    "resulting in",
+    "led to",
+    "developed",
+    "development of",
+    "reaction to",
+    "toxicity",
+    "adverse effect",
+    "side effect",
+    "subsequent to",
+    "manifesting as",
+    "experienced"
+  ],
+  "DDI_ADVICE_TRIGGERS": [
+    "should not be used with",
+    "should not use with",
+    "avoid",
+    "contraindicated",
+    "not recommended",
+    "caution",
+    "warning"
+  ],
+  "DDI_EFFECT_TRIGGERS": [
+    "increase the effect",
+    "decrease the effect",
+    "enhance",
+    "reduce efficacy",
+    "toxicity",
+    "potentiate",
+    "increase plasma concentration",
+    "decrease plasma concentration"
+  ],
+  "DDI_MECHANISM_TRIGGERS": [
+    "metabolism",
+    "metabolized by",
+    "enzyme",
+    "cyp",
+    "absorption",
+    "excretion",
+    "clearance",
+    "inhibit",
+    "inhibits",
+    "induce",
+    "induces"
+  ],
+  "DDI_INT_TRIGGERS": [
+    "interact",
+    "interaction",
+    "interacts with",
+    "coadministration",
+    "concomitant",
+    "combination"
+  ],
+  "MIN_EFFECT_LEN": 2,
+  "MIN_DRUG_LEN": 3,
+  "MAX_DRUGS_PER_SENT_FOR_DDI": 4
+}

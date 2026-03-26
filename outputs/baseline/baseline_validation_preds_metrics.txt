@@ -1,0 +1,10 @@
+================================================================================
+Prediction file: outputs/baseline/baseline_validation_preds.jsonl
+Total samples: 436
+JSON valid: 436/436 = 100.00%
+Exact match accuracy: 26/436 = 5.96%
+TP=72, FP=187, FN=786
+Precision: 0.2780
+Recall:    0.0839
+F1:        0.1289
+================================================================================
