@@ -1,0 +1,17 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/test_predictions_vllm_batch64_base_no_thinking_1024.jsonl
+Total samples: 619
+Parsed successfully: 619/619 = 100.00%
+Exact match accuracy: 139/619 = 22.46%
+TP=424, FP=1351, FN=1187
+Precision: 0.2389
+Recall:    0.2632
+F1:        0.2504
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=233 FP=268 FN=435 P=0.4651 R=0.3488 F1=0.3986
+DDI-MECHANISM: TP=41 FP=140 FN=249 P=0.2265 R=0.1414 F1=0.1741
+DDI-EFFECT: TP=87 FP=423 FN=254 P=0.1706 R=0.2551 F1=0.2045
+DDI-ADVISE: TP=31 FP=112 FN=185 P=0.2168 R=0.1435 F1=0.1727
+DDI-INT: TP=32 FP=408 FN=64 P=0.0727 R=0.3333 F1=0.1194
+================================================================================
