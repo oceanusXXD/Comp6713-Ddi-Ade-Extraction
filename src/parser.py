@@ -101,6 +101,8 @@ def normalize_label(raw_label: Any) -> str:
 
 def normalize_relation_item(item: Dict[str, Any]) -> Dict[str, str]:
     """把关系对象的别名字段统一到仓库标准字段名。"""
+    if not isinstance(item, dict):
+        raise ValueError(f"Unsupported relation item type: {type(item)!r}")
     normalized_item: Dict[str, str] = {}
     for target_key, aliases in RELATION_KEYS.items():
         raw_value: Any = ""
@@ -219,7 +221,7 @@ def parse_prediction_text(text: str) -> ParsedPrediction:
                     failure_reason=None,
                     raw_candidate=candidate_text,
                 )
-            except (ValueError, SyntaxError, json.JSONDecodeError) as exc:
+            except (ValueError, TypeError, SyntaxError, json.JSONDecodeError) as exc:
                 last_error = exc
                 continue
 
