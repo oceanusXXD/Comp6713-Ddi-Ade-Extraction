@@ -1,0 +1,83 @@
+Qwen3-8B r4 系列 LoRA 变体基础结果
+=================================
+
+用途
+----
+这个文件用于保留已经删除的 r4 系列 LoRA 变体实验的基础结果。这批实验使用的数据为：
+
+- 训练集：`data/processed/Comp6713-Ddi-Ade-Extraction_final_r4/merged_chatml_train.jsonl`
+- 验证集：`data/processed/Comp6713-Ddi-Ade-Extraction_final_r4/merged_chatml_validation.jsonl`
+
+结果来源
+--------
+这里的可比指标原先提取自仓库中的 `variant_benchmark_qwen3_8b_smoke` 冒烟实验结果。
+相关 smoke 目录后续已清理，因此本文件承担了这些基础结果的长期保留职责。
+
+说明
+----
+这些 r4 输出目录没有单独保存正式测试集 `test_metrics`。
+在 `summary.json` 中，对应条目的 `test_metrics` 都是 `null`。
+因此这里保留的是目前仓库里可追溯的基础结果：
+
+- smoke validation 指标
+- 每次训练记录中的最终 `train_loss`
+
+重要说明
+--------
+这里的 smoke 结果只适合做“小样本快速对比”参考，不代表这些 LoRA 变体在更大验证集或正式测试集上的整体强弱。
+
+后续在更大规模的 `screen1e` 验证中，`rslora` 的整体 F1 高于 `pissa16`：
+
+- `rslora_validation_metrics.txt`：`F1=0.4565`
+- `pissa_validation_metrics.txt`：`F1=0.4311`
+
+因此，不能根据下面这组 smoke 指标直接得出“`pissa16` 整体优于 `rslora`”的结论。
+
+各变体结果
+----------
+1. lora
+   原目录：`outputs/qwen3_8b_lora_ddi_ade_r4`
+   配置：标准 LoRA，`r=32`，`alpha=64`，`dropout=0.1`
+   smoke validation：`F1=0.5294`，`EM=0.3750`，`parse=1.0000`，`P=0.9000`，`R=0.3750`
+   最终 `train_loss`：`9.1387`
+
+2. dora
+   原目录：`outputs/qwen3_8b_lora_ddi_ade_r4_dora`
+   配置：启用 DoRA
+   smoke validation：`F1=0.5294`，`EM=0.3750`，`parse=1.0000`，`P=0.9000`，`R=0.3750`
+   最终 `train_loss`：`9.2139`
+
+3. lorafa
+   原目录：`outputs/qwen3_8b_lora_ddi_ade_r4_lorafa`
+   配置：使用 LoRA-FA 优化器
+   smoke validation：`F1=0.5294`，`EM=0.3750`，`parse=1.0000`，`P=0.9000`，`R=0.3750`
+   最终 `train_loss`：`9.1845`
+
+4. loraplus
+   原目录：`outputs/qwen3_8b_lora_ddi_ade_r4_loraplus`
+   配置：使用 LoRA+ 优化器
+   smoke validation：`F1=0.5581`，`EM=0.3750`，`parse=1.0000`，`P=0.6316`，`R=0.5000`
+   最终 `train_loss`：`7.7118`
+
+5. pissa16
+   原目录：`outputs/qwen3_8b_lora_ddi_ade_r4_pissa16`
+   配置：PiSSA 初始化，`init_lora_weights=pissa_niter_16`
+   smoke validation：`F1=0.7805`，`EM=0.5000`，`parse=1.0000`，`P=0.9412`，`R=0.6667`
+   最终 `train_loss`：`7.7443`
+
+6. rslora
+   原目录：`outputs/qwen3_8b_lora_ddi_ade_r4_rslora`
+   配置：启用 rsLoRA
+   smoke validation：`F1=0.7727`，`EM=0.5000`，`parse=1.0000`，`P=0.8500`，`R=0.7083`
+   最终 `train_loss`：`8.0244`
+
+按小样本 smoke validation F1 排序
+--------------------------------
+下面这个排序仅对应已清理的小样本 smoke 验证结果，不代表整体泛化能力或正式测试表现排序：
+
+1. `pissa16`：`0.7805`
+2. `rslora`：`0.7727`
+3. `loraplus`：`0.5581`
+4. `lora`：`0.5294`
+5. `dora`：`0.5294`
+6. `lorafa`：`0.5294`

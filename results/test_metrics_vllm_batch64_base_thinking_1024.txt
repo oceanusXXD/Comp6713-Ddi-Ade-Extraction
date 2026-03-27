@@ -1,5 +1,5 @@
 ================================================================================
-Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/test_predictions_vllm_batch64_base_thinking_1024.jsonl
+Prediction file: [original prediction jsonl removed during repository cleanup; this txt is the retained summary]
 Total samples: 619
 Parsed successfully: 422/619 = 68.17%
 Parse failure counts: {'invalid_json': 197}

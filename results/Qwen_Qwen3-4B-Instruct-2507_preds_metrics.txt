@@ -1,5 +1,5 @@
 ================================================================================
-Prediction file: results/Qwen_Qwen3-4B-Instruct-2507_preds.jsonl
+Prediction file: [original prediction jsonl removed during repository cleanup; this txt is the retained summary]
 Total samples: 619
 JSON valid: 619/619 = 100.00%
 Exact match accuracy: 109/619 = 17.61%

@@ -26,11 +26,21 @@ models/
 
 # Generated inference and evaluation artifacts
 results/*
+!results/README.md
 !results/*.txt
+
+# Local evaluation bundles
+evaluate_datasets/**
+!evaluate_datasets/**/
+!evaluate_datasets/**/README*.md
+!evaluate_datasets/**/*.md
+!evaluate_datasets/**/*.py
+!evaluate_datasets/**/*.sh
 
 # Training outputs: keep the final LoRA adapter only
 outputs/*
 !outputs/README.md
+!outputs/r4_lora_variant_baseline_results.txt
 !outputs/qwen3_8b_lora/
 outputs/qwen3_8b_lora/*
 !outputs/qwen3_8b_lora/final_adapter/

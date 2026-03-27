@@ -1,5 +1,5 @@
 ================================================================================
-Prediction file: results/Qwen_Qwen3-8B_preds.jsonl
+Prediction file: [original prediction jsonl removed during repository cleanup; this txt is the retained summary]
 Total samples: 619
 JSON valid: 517/619 = 83.52%
 Exact match accuracy: 224/619 = 36.19%

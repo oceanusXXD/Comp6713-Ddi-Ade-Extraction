@@ -1,5 +1,5 @@
 ================================================================================
-Prediction file: results/NousResearch_Meta-Llama-3-8B-Instruct_preds.jsonl
+Prediction file: [original prediction jsonl removed during repository cleanup; this txt is the retained summary]
 Total samples: 619
 JSON valid: 619/619 = 100.00%
 Exact match accuracy: 180/619 = 29.08%

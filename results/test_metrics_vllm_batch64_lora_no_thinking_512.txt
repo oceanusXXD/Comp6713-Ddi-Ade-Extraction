@@ -1,5 +1,5 @@
 ================================================================================
-Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/test_predictions_vllm_batch64_lora_no_thinking_512.jsonl
+Prediction file: [original prediction jsonl removed during repository cleanup; this txt is the retained summary]
 Total samples: 619
 Parsed successfully: 619/619 = 100.00%
 Exact match accuracy: 363/619 = 58.64%
