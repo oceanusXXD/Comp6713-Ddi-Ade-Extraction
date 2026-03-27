@@ -13,7 +13,7 @@
 - `qwen3_8b_lora_ddi_ade_final/`
   一轮较早 `final` 版本训练留下的输出目录。
 - `qwen3_8b_lora_ddi_ade_final_aug_e4/`
-  当前主线训练输出目录，现阶段主要保存 checkpoint 和 `observability/`。
+  当前主线训练输出目录，现阶段主要保存 checkpoint、`final_adapter/` 和 `observability/`。
 - `r4_lora_variant_baseline_results.txt`
   已清理的 r4 系列 LoRA 变体实验摘要，只保留可追溯的基础结果，不保留原始目录。
 
@@ -75,6 +75,25 @@
 如果你要看当前主线训练，优先看：
 
 - `qwen3_8b_lora_ddi_ade_final_aug_e4/`
+
+这个目录目前已经整理成可直接引用的主线训练产物，重点包括：
+
+- `checkpoint-620/`
+  当前训练过程中验证损失最好的保留 checkpoint。
+- `checkpoint-1085/`
+  训练后段保留的中间 checkpoint。
+- `checkpoint-1232/`
+  本轮训练完成时的最终 checkpoint。
+- `final_adapter/`
+  训练跑完后导出的最终 adapter。
+- `observability/`
+  训练配置、训练日志、数据统计和环境快照。
+
+如果你是从今天的 benchmark 结果倒查模型来源，也建议优先对应：
+
+- `results/benchmark_suite_vllm_batch64_20260327/`
+
+其中 `rslora_620` 和 `rslora_1232` 可以直接和这里的现存 checkpoint 对上；`rslora_930` 是今天保留下来的历史评测结果快照，但当前 `outputs/` 下不再单独保留 `checkpoint-930/` 目录。
 
 如果你要看一个已保留的、可以直接分享的 adapter 示例，优先看：
 

@@ -2,6 +2,31 @@
 
 这个目录保存推理预测文件、指标文件和变体实验结果。它更像“实验记录区”，不是当前主线唯一输出源。
 
+## 今日主线测试入口
+
+如果你现在要回看 2026-03-27 这轮全量评测，优先看：
+
+- `benchmark_suite_vllm_batch64_20260327/`
+
+这个目录保存了今天串行跑完的一整套 vLLM benchmark，覆盖：
+
+- `base`
+- `base+lora`
+- `base+rslora@620`
+- `base+rslora@930`
+- `base+rslora@1232`
+
+建议按下面顺序查看：
+
+- `benchmark_suite_vllm_batch64_20260327/summary.csv`
+  全量汇总表，适合做横向比较和后续画表。
+- `benchmark_suite_vllm_batch64_20260327/benchmark_analysis_zh.txt`
+  中文分析摘要，直接给出主任务、泛化和 guardrail 结论。
+- `benchmark_suite_vllm_batch64_20260327/<variant>/`
+  每个模型变体对应一个子目录，里面保留逐数据集的 `predictions.jsonl`、`metrics.json` 和 `metrics.txt`。
+
+这轮 benchmark 当前应视为 `results/` 下最重要的一组结果。
+
 ## 当前保留原则
 
 - `results/` 顶层默认只长期保留 `README.md` 和 `*.txt`
@@ -29,6 +54,8 @@
 
 - `test_metrics_vllm_batch64_*.txt`
   不同设置下的测试集文本指标。
+
+这些文件更适合看“单一测试集上的设置差异”，不再是今天全量 benchmark 的主入口。
 
 常见后缀含义：
 

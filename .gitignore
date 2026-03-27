@@ -28,6 +28,10 @@ models/
 results/*
 !results/README.md
 !results/*.txt
+!results/benchmark_suite_vllm_batch64_20260327/
+results/benchmark_suite_vllm_batch64_20260327/*
+!results/benchmark_suite_vllm_batch64_20260327/README.md
+!results/benchmark_suite_vllm_batch64_20260327/benchmark_analysis_zh.txt
 
 # Local evaluation bundles
 evaluate_datasets/**
