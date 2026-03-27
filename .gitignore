@@ -49,3 +49,4 @@ outputs/*
 outputs/qwen3_8b_lora/*
 !outputs/qwen3_8b_lora/final_adapter/
 !outputs/qwen3_8b_lora/final_adapter/**
+!results/benchmark_suite_vllm_batch64_20260327/summary.csv
