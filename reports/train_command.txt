@@ -1,0 +1,4 @@
+cd /home/coder/data/Comp6713-Ddi-Ade-Extraction && .venv/bin/python scripts/analysis/audit_and_prepare_final_dataset.py
+cd /home/coder/data/Comp6713-Ddi-Ade-Extraction && .venv/bin/python scripts/train/train_finetune.py --config configs/qwen3_8b_lora_ddi_ade_final.yaml --dry-run-samples 8
+cd /home/coder/data/Comp6713-Ddi-Ade-Extraction && .venv/bin/python scripts/train/train_finetune.py --config configs/qwen3_8b_lora_ddi_ade_final.yaml --do-train
+cd /home/coder/data/Comp6713-Ddi-Ade-Extraction && .venv/bin/python scripts/inference/predict.py --config configs/infer_qwen3_8b_lora_ddi_ade_final.yaml

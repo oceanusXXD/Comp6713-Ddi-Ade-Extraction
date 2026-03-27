@@ -1,0 +1,481 @@
+[
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Ethambutol produced an acute psychotic reaction soon after treatment began.",
+    "relations": [
+      {
+        "head_entity": "Ethambutol",
+        "tail_entity": "acute psychotic reaction",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Two patients developed nonconvulsive status epilepticus during chemotherapy that included ifosfamide.",
+    "relations": [
+      {
+        "head_entity": "ifosfamide",
+        "tail_entity": "nonconvulsive status epilepticus",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Although uncommon, nitrofurantoin can trigger acute pulmonary reactions that in severe cases progress to pulmonary dysfunction.",
+    "relations": [
+      {
+        "head_entity": "nitrofurantoin",
+        "tail_entity": "acute pulmonary reactions",
+        "relation_type": "ADE"
+      },
+      {
+        "head_entity": "nitrofurantoin",
+        "tail_entity": "pulmonary dysfunction",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "The literature continues to implicate propranolol as a cause of central nervous system disturbances.",
+    "relations": [
+      {
+        "head_entity": "propranolol",
+        "tail_entity": "central nervous system disturbances",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Heparin therapy has been associated with clinically significant hyperkalemia.",
+    "relations": [
+      {
+        "head_entity": "Heparin",
+        "tail_entity": "hyperkalemia",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Fludarabine phosphate treatment is notable for CD4 T-lymphocyte depletion, myelosuppression, and severe infections.",
+    "relations": [
+      {
+        "head_entity": "Fludarabine phosphate",
+        "tail_entity": "CD4 T-lymphocyte depletion",
+        "relation_type": "ADE"
+      },
+      {
+        "head_entity": "Fludarabine phosphate",
+        "tail_entity": "myelosuppression",
+        "relation_type": "ADE"
+      },
+      {
+        "head_entity": "Fludarabine phosphate",
+        "tail_entity": "severe infections",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Fluconazole inhibits CYP2C9-mediated metabolism of celecoxib, thereby increasing celecoxib plasma concentrations; celecoxib should therefore be initiated at the lowest recommended dose in patients receiving fluconazole.",
+    "relations": [
+      {
+        "head_entity": "Fluconazole",
+        "tail_entity": "celecoxib",
+        "relation_type": "DDI-MECHANISM"
+      },
+      {
+        "head_entity": "celecoxib",
+        "tail_entity": "fluconazole",
+        "relation_type": "DDI-ADVISE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "In extensive metabolizers, paroxetine raises atomoxetine exposure to values resembling those of poor metabolizers.",
+    "relations": [
+      {
+        "head_entity": "paroxetine",
+        "tail_entity": "atomoxetine",
+        "relation_type": "DDI-MECHANISM"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Piperacillin sodium can decrease methotrexate excretion, so methotrexate concentrations should be monitored to avoid toxicity.",
+    "relations": [
+      {
+        "head_entity": "Piperacillin sodium",
+        "tail_entity": "methotrexate",
+        "relation_type": "DDI-MECHANISM"
+      },
+      {
+        "head_entity": "Piperacillin sodium",
+        "tail_entity": "methotrexate",
+        "relation_type": "DDI-ADVISE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "NSAIDs may blunt the antihypertensive response to ACE inhibitors and reduce the natriuretic effect of furosemide.",
+    "relations": [
+      {
+        "head_entity": "NSAIDs",
+        "tail_entity": "ACE inhibitors",
+        "relation_type": "DDI-EFFECT"
+      },
+      {
+        "head_entity": "NSAIDs",
+        "tail_entity": "furosemide",
+        "relation_type": "DDI-EFFECT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "Flupenthixol taken with Ethanol can lead to additive CNS depression.",
+    "relations": [
+      {
+        "head_entity": "Flupenthixol",
+        "tail_entity": "Ethanol",
+        "relation_type": "DDI-EFFECT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "paraphrase",
+    "user_text": "EPA supplements have been reported to interact with aspirin and ginkgo, although a specific mechanism has not been defined.",
+    "relations": [
+      {
+        "head_entity": "EPA supplements",
+        "tail_entity": "aspirin",
+        "relation_type": "DDI-INT"
+      },
+      {
+        "head_entity": "EPA supplements",
+        "tail_entity": "ginkgo",
+        "relation_type": "DDI-INT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Warfarin was discontinued before fluconazole was started, and no bleeding or INR instability occurred during the interval.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "The patient had used nitrofurantoin months earlier, but the current cough and infiltrates were attributed to community-acquired pneumonia.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Celecoxib was prescribed for arthritis, while fluconazole was considered but never given.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Methotrexate was withheld until piperacillin therapy had ended, after which renal function and methotrexate levels remained stable.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Although the chart listed aspirin sensitivity, the patient tolerated low-dose aspirin without urticaria, angioedema, or respiratory symptoms.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Hyperkalemia resolved after dialysis in a patient receiving heparin, and the team attributed the electrolyte abnormality to renal failure rather than medication.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Atomoxetine and paroxetine were both mentioned in the medication history, but they were not taken concurrently.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "The patient receiving simvastatin developed leg weakness before colchicine was added for gout.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Bromocriptine was continued, whereas metoclopramide was stopped on admission and no change in symptom control was observed.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "Foscarnet was avoided because amphotericin B was required, so the two drugs were never coadministered.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "A note warned that tetracyclines can raise intracranial pressure, but this patient on acitretin had not used any tetracycline.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "negative",
+    "user_text": "During celecoxib therapy with aspirin prophylaxis, endoscopy remained normal and no gastrointestinal complication was documented.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "After propranolol was started, insomnia and slowed thinking were reported, although similar symptoms had preceded treatment and causality remained uncertain.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "A mild rise in tacrolimus concentration was noted after fluconazole exposure, but the sample was drawn late and the team could not determine whether coadministration was responsible.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Pulmonary infiltrates appeared while the patient was taking nitrofurantoin, yet a concurrent viral infection prevented the clinicians from establishing drug-induced lung injury.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Serum potassium increased during Heparin therapy, but worsening kidney function and spironolactone use were considered more likely explanations.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Blood pressure control deteriorated in a patient receiving ibuprofen and lisinopril, although adherence to the antihypertensive regimen was uncertain.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Methotrexate concentrations were slightly higher while piperacillin was administered, but dehydration and delayed clearance from renal dysfunction could not be excluded.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Epigastric pain developed during concomitant celecoxib and aspirin use, but no ulcer, bleeding, or definite drug-related complication was demonstrated.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "The patient described weakness after colchicine was added to long-term simvastatin, although the neurology team favored underlying neuropathy over a medication effect.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "While taking atomoxetine with paroxetine, the patient reported palpitations, but caffeine excess and anxiety were considered equally plausible contributors.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Because response fluctuated, a nurse questioned the role of concurrent bromocriptine and metoclopramide, but no measurable change was documented after both were given.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "Dyspnea emerged soon after nitrofurantoin re-exposure; however, because chest imaging also suggested fluid overload, the episode was described as possibly, rather than clearly, drug related.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "margincase",
+    "user_text": "The team questioned whether EPA supplements contributed to bruising in a patient also taking aspirin, but the temporal association alone was insufficient to confirm a drug-related contribution.",
+    "relations": []
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "When fluconazole was added to chronic celecoxib therapy for oral candidiasis, the latter had to be reduced after celecoxib plasma concentrations nearly doubled, whereas methotrexate kinetics, measured in the same patient, were unchanged.",
+    "relations": [
+      {
+        "head_entity": "fluconazole",
+        "tail_entity": "celecoxib",
+        "relation_type": "DDI-MECHANISM"
+      },
+      {
+        "head_entity": "celecoxib",
+        "tail_entity": "fluconazole",
+        "relation_type": "DDI-ADVISE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "Because atomoxetine is cleared mainly by CYP2D6, paroxetine, unlike the inhaled albuterol the patient used intermittently, drove atomoxetine exposure toward poor-metabolizer levels, so a lower atomoxetine dose was recommended.",
+    "relations": [
+      {
+        "head_entity": "paroxetine",
+        "tail_entity": "atomoxetine",
+        "relation_type": "DDI-MECHANISM"
+      },
+      {
+        "head_entity": "atomoxetine",
+        "tail_entity": "paroxetine",
+        "relation_type": "DDI-ADVISE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "In the perioperative record, piperacillin, but not cefazolin, preceded an unexpectedly prolonged vecuronium block, and once the same antibiotic was continued on the ward, methotrexate clearance also fell.",
+    "relations": [
+      {
+        "head_entity": "piperacillin",
+        "tail_entity": "methotrexate",
+        "relation_type": "DDI-MECHANISM"
+      },
+      {
+        "head_entity": "piperacillin",
+        "tail_entity": "vecuronium",
+        "relation_type": "DDI-EFFECT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "A woman taking acitretin was also relying on a microdosed progestin minipill and, for acne, doxycycline; the former became unreliable, and the latter was discontinued because the combination could raise intracranial pressure.",
+    "relations": [
+      {
+        "head_entity": "acitretin",
+        "tail_entity": "doxycycline",
+        "relation_type": "DDI-EFFECT"
+      },
+      {
+        "head_entity": "acitretin",
+        "tail_entity": "microdosed progestin minipill",
+        "relation_type": "DDI-EFFECT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "Although lithium concentrations had been stable for months, once CELEBREX was started for arthritis they increased, and the patient was told that any future introduction or withdrawal of CELEBREX should prompt repeat monitoring.",
+    "relations": [
+      {
+        "head_entity": "lithium",
+        "tail_entity": "CELEBREX",
+        "relation_type": "DDI-ADVISE"
+      },
+      {
+        "head_entity": "lithium",
+        "tail_entity": "CELEBREX",
+        "relation_type": "DDI-MECHANISM"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "The intern first blamed pneumonia for the patient's dyspnea, but the abrupt onset of cough, fever, and diffuse infiltrates within 48 hours of nitrofurantoin re-exposure ultimately pointed to acute pulmonary reactions from that drug.",
+    "relations": [
+      {
+        "head_entity": "nitrofurantoin",
+        "tail_entity": "acute pulmonary reactions",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "Vincristine sulfate, prednisone, and asparaginase were begun together; five days later one child developed dural sinus thrombosis, a complication the team attributed to the induction regimen rather than dehydration.",
+    "relations": [
+      {
+        "head_entity": "asparaginase",
+        "tail_entity": "dural sinus thrombosis",
+        "relation_type": "ADE"
+      },
+      {
+        "head_entity": "prednisone",
+        "tail_entity": "dural sinus thrombosis",
+        "relation_type": "ADE"
+      },
+      {
+        "head_entity": "Vincristine sulfate",
+        "tail_entity": "dural sinus thrombosis",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "The patient, who had tolerated simvastatin for years, developed profound weakness only after colchicine was added for gout and, because renal function was mildly reduced, both agents were considered contributors.",
+    "relations": [
+      {
+        "head_entity": "colchicine",
+        "tail_entity": "profound weakness",
+        "relation_type": "ADE"
+      },
+      {
+        "head_entity": "simvastatin",
+        "tail_entity": "profound weakness",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "Not the beta-blocker he had used earlier, but propranolol, introduced three days before admission, was regarded as the most likely cause of the new central nervous system disturbances.",
+    "relations": [
+      {
+        "head_entity": "propranolol",
+        "tail_entity": "central nervous system disturbances",
+        "relation_type": "ADE"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "After FOSCAVIR was combined with intravenous pentamidine, severe hypocalcemia developed; because amphotericin B had also been proposed, the note emphasized that other nephrotoxic agents should be avoided.",
+    "relations": [
+      {
+        "head_entity": "FOSCAVIR",
+        "tail_entity": "amphotericin B",
+        "relation_type": "DDI-ADVISE"
+      },
+      {
+        "head_entity": "FOSCAVIR",
+        "tail_entity": "intravenous pentamidine",
+        "relation_type": "DDI-EFFECT"
+      },
+      {
+        "head_entity": "FOSCAVIR",
+        "tail_entity": "intravenous pentamidine",
+        "relation_type": "DDI-INT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "In a patient already taking aspirin, lisinopril, and furosemide, it was ibuprofen, not the antihistamine started the same week, that coincided with worsening blood-pressure control and diminished diuresis.",
+    "relations": [
+      {
+        "head_entity": "ibuprofen",
+        "tail_entity": "furosemide",
+        "relation_type": "DDI-EFFECT"
+      },
+      {
+        "head_entity": "ibuprofen",
+        "tail_entity": "lisinopril",
+        "relation_type": "DDI-EFFECT"
+      }
+    ]
+  },
+  {
+    "augmentation_type": "hardcase",
+    "user_text": "The chart first noted only that bromocriptine might interact with dopamine antagonists, but once metoclopramide was introduced the patient's response to bromocriptine clearly diminished, whereas ondansetron had no such effect.",
+    "relations": [
+      {
+        "head_entity": "bromocriptine",
+        "tail_entity": "dopamine antagonists",
+        "relation_type": "DDI-INT"
+      },
+      {
+        "head_entity": "bromocriptine",
+        "tail_entity": "metoclopramide",
+        "relation_type": "DDI-EFFECT"
+      }
+    ]
+  }
+]

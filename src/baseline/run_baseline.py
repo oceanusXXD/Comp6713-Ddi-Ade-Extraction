@@ -1,3 +1,5 @@
+"""规则基线推理脚本。"""
+
 import argparse
 import json
 from pathlib import Path
@@ -9,6 +11,7 @@ from src.baseline.rule_config import DEFAULT_CONFIG
 
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
+    """读取 JSONL 文件。"""
     rows = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -19,6 +22,7 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 
 def write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
+    """写 JSONL 文件。"""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for row in rows:
@@ -26,16 +30,19 @@ def write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
 
 
 def load_json(path: Path) -> Dict[str, Any]:
+    """读取 JSON 配置。"""
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def load_lexicon(path: Path) -> List[str]:
+    """读取词典文件。"""
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def extract_user_text(messages: List[Dict[str, Any]]) -> str:
+    """从 ChatML 中取出 user 文本。"""
     for msg in messages:
         if msg.get("role") == "user":
             return msg.get("content", "").strip()
@@ -43,6 +50,7 @@ def extract_user_text(messages: List[Dict[str, Any]]) -> str:
 
 
 def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """从 ChatML 中取出 assistant gold 关系列表。"""
     for msg in messages:
         if msg.get("role") == "assistant":
             content = msg.get("content", "").strip()
@@ -56,15 +64,18 @@ def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any
 
 
 def norm(s: str) -> str:
+    """转小写并折叠空白。"""
     return " ".join(str(s).strip().lower().split())
 
 
 def sentence_contains_any(text: str, triggers: List[str]) -> bool:
+    """判断句子是否包含任一触发词。"""
     text_norm = norm(text)
     return any(t in text_norm for t in triggers)
 
 
 def dedup_relations(relations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """按关系三元组去重。"""
     seen: Set[Tuple[str, str, str]] = set()
     deduped = []
     for rel in relations:
@@ -131,6 +142,7 @@ def token_distance(m1: Dict[str, Any], m2: Dict[str, Any]) -> int:
 
 
 def choose_nearest_drug(effect_mention: Dict[str, Any], drug_mentions: List[Dict[str, Any]], max_distance: int):
+    """为 effect mention 选择距离最近的 drug mention。"""
     candidates = []
     for drug in drug_mentions:
         dist = token_distance(effect_mention, drug)
@@ -169,6 +181,7 @@ def predict_relations(
     effect_lexicon: List[str],
     config: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
+    """对单条文本应用规则基线并产出预测关系。"""
     ade_triggers = config["ADE_TRIGGERS"]
     ddi_trigger_groups = {
         "DDI-advice": config["DDI_ADVICE_TRIGGERS"],
@@ -191,7 +204,7 @@ def predict_relations(
         drug_mentions = find_mentions_with_positions(sent_text, drug_lexicon, min_drug_len)
         effect_mentions = find_mentions_with_positions(sent_text, effect_lexicon, min_effect_len)
 
-        # ===== ADE rules =====
+        # ===== ADE 规则 =====
         if drug_mentions and effect_mentions and sentence_contains_any(sent_text, ade_triggers):
             for effect in effect_mentions:
                 nearest_drug = choose_nearest_drug(
@@ -208,11 +221,11 @@ def predict_relations(
                         }
                     )
 
-        # ===== DDI rules =====
+        # ===== DDI 规则 =====
         if 2 <= len(drug_mentions) <= max_drugs_per_sent_for_ddi:
             ddi_type = None
 
-            # priority：advice -> mechanism -> effect -> int
+            # 优先级：advice -> mechanism -> effect -> int
             ddi_priority = ["DDI-advice", "DDI-mechanism", "DDI-effect", "DDI-int"]
             for rel_type in ddi_priority:
                 triggers = ddi_trigger_groups[rel_type]
@@ -238,6 +251,7 @@ def predict_relations(
 
 
 def main() -> None:
+    """在指定数据集上运行规则基线并写出预测。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, required=True)
     parser.add_argument("--drug_lexicon_path", type=str, default="resources/baseline/drug_lexicon.json")

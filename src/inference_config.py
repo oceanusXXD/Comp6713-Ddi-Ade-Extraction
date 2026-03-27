@@ -1,3 +1,5 @@
+"""推理配置加载与命令行覆盖工具。"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -59,6 +61,7 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
 
 
 def split_to_default_path(split: str) -> Path:
+    """把简写 split 名称映射到仓库默认数据路径。"""
     normalized = split.strip().lower()
     if normalized == "dev":
         normalized = "validation"
@@ -68,10 +71,12 @@ def split_to_default_path(split: str) -> Path:
 
 
 def resolve_output_path(value: Optional[str]) -> Optional[Path]:
+    """解析输出文件路径。"""
     return resolve_project_path(value)
 
 
-def load_inference_config(config_path: str | Path) -> Dict[str, Any]:
+def load_inference_config(config_path: str | Path, *, validate: bool = True) -> Dict[str, Any]:
+    """读取推理配置，并把路径、模型来源和输出路径都解析成可执行状态。"""
     config_path = Path(config_path).expanduser().resolve()
     with config_path.open("r", encoding="utf-8") as handle:
         loaded = yaml.safe_load(handle) or {}
@@ -97,11 +102,13 @@ def load_inference_config(config_path: str | Path) -> Dict[str, Any]:
     config["output"]["predictions_path"] = resolve_output_path(config["output"].get("predictions_path"))
     config["output"]["metrics_path"] = resolve_output_path(config["output"].get("metrics_path"))
     config["output"]["metrics_json_path"] = resolve_output_path(config["output"].get("metrics_json_path"))
-    validate_inference_config(config)
+    if validate:
+        validate_inference_config(config)
     return config
 
 
 def validate_inference_config(config: Dict[str, Any]) -> None:
+    """在真正启动推理前验证关键推理配置。"""
     backend = str(config.get("backend", "transformers")).lower()
     if backend not in {"transformers", "vllm"}:
         raise ValueError("backend must be either 'transformers' or 'vllm'.")
@@ -132,6 +139,7 @@ def validate_inference_config(config: Dict[str, Any]) -> None:
 
 
 def apply_cli_overrides(config: Dict[str, Any], args: Any) -> Dict[str, Any]:
+    """把命令行参数覆盖到 YAML 配置上。"""
     merged = deep_merge_dict(config, {})
     if args.backend is not None:
         merged["backend"] = args.backend

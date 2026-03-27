@@ -1,0 +1,769 @@
+{
+  "paths": {
+    "original_train": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train.jsonl",
+    "original_validation": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_validation.jsonl",
+    "original_test": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_test.jsonl",
+    "current_augmentation_jsonl": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train_augmentations.jsonl",
+    "primary_spec": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations.json",
+    "supplement_spec": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations_supplement_augment.json",
+    "processed_dir": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final",
+    "final_train": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train.jsonl",
+    "final_validation": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_validation.jsonl",
+    "final_test": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_test.jsonl",
+    "final_augmentations": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train_augmentations.jsonl"
+  },
+  "spec_merge": {
+    "duplicate_spec_entries_removed": 0,
+    "duplicate_spec_texts": [],
+    "per_source_counts": {
+      "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations_supplement_augment.json": 64
+    }
+  },
+  "supplement_delta": {
+    "retained_previous_rows": 48,
+    "new_rows_added": 16,
+    "previous_rows_removed": 0
+  },
+  "final_dataset_hash": "c5fc8c06",
+  "removed_polluted_train_rows": 5,
+  "filtered_original_train_rows": 3912,
+  "final_augmentation_positive_rows": 32,
+  "final_augmentation_empty_rows": 32,
+  "final_train_empty_rows": 32,
+  "files": {
+    "original_train": {
+      "num_rows": 3917,
+      "parse_failures": 0,
+      "empty_user": 0,
+      "empty_assistant": 0,
+      "invalid_labels": 0,
+      "entity_substring_issues": 0,
+      "duplicate_text_examples": 3,
+      "relation_counts": {
+        "ADE": 5369,
+        "DDI-ADVISE": 744,
+        "DDI-EFFECT": 1489,
+        "DDI-INT": 182,
+        "DDI-MECHANISM": 1159
+      },
+      "augmentation_type_counts": {},
+      "relations_per_sample": {
+        "min": 1,
+        "max": 89,
+        "mean": 2.2831248404391116,
+        "median": 1.0
+      },
+      "unique_entity_counts": {
+        "min": 2,
+        "max": 84,
+        "mean": 3.190451876436048,
+        "median": 2.0
+      },
+      "word_lengths": {
+        "min": 2,
+        "max": 1224,
+        "mean": 41.565994383456726,
+        "median": 18.0
+      },
+      "long_gap_relations": 6712,
+      "marker_counts": {
+        "conditional": 530,
+        "coordination": 2286,
+        "negation": 474,
+        "speculative": 659
+      },
+      "sample_errors": []
+    },
+    "original_validation": {
+      "num_rows": 436,
+      "parse_failures": 0,
+      "empty_user": 0,
+      "empty_assistant": 0,
+      "invalid_labels": 0,
+      "entity_substring_issues": 0,
+      "duplicate_text_examples": 0,
+      "relation_counts": {
+        "ADE": 579,
+        "DDI-ADVISE": 65,
+        "DDI-EFFECT": 125,
+        "DDI-INT": 7,
+        "DDI-MECHANISM": 82
+      },
+      "augmentation_type_counts": {},
+      "relations_per_sample": {
+        "min": 1,
+        "max": 28,
+        "mean": 1.9678899082568808,
+        "median": 1.0
+      },
+      "unique_entity_counts": {
+        "min": 2,
+        "max": 27,
+        "mean": 2.94954128440367,
+        "median": 2.0
+      },
+      "word_lengths": {
+        "min": 2,
+        "max": 730,
+        "mean": 35.555045871559635,
+        "median": 18.0
+      },
+      "long_gap_relations": 583,
+      "marker_counts": {
+        "conditional": 53,
+        "coordination": 252,
+        "negation": 42,
+        "speculative": 71
+      },
+      "sample_errors": []
+    },
+    "original_test": {
+      "num_rows": 619,
+      "parse_failures": 0,
+      "empty_user": 0,
+      "empty_assistant": 0,
+      "invalid_labels": 0,
+      "entity_substring_issues": 0,
+      "duplicate_text_examples": 0,
+      "relation_counts": {
+        "ADE": 668,
+        "DDI-ADVISE": 216,
+        "DDI-EFFECT": 341,
+        "DDI-INT": 96,
+        "DDI-MECHANISM": 290
+      },
+      "augmentation_type_counts": {},
+      "relations_per_sample": {
+        "min": 1,
+        "max": 37,
+        "mean": 2.602584814216478,
+        "median": 1.0
+      },
+      "unique_entity_counts": {
+        "min": 2,
+        "max": 26,
+        "mean": 3.533117932148627,
+        "median": 2.0
+      },
+      "word_lengths": {
+        "min": 2,
+        "max": 799,
+        "mean": 54.019386106623585,
+        "median": 22.0
+      },
+      "long_gap_relations": 1266,
+      "marker_counts": {
+        "conditional": 142,
+        "coordination": 390,
+        "negation": 126,
+        "speculative": 170
+      },
+      "sample_errors": []
+    },
+    "current_augmentations": {
+      "num_rows": 48,
+      "parse_failures": 0,
+      "empty_user": 0,
+      "empty_assistant": 0,
+      "invalid_labels": 0,
+      "entity_substring_issues": 0,
+      "duplicate_text_examples": 0,
+      "relation_counts": {
+        "ADE": 16,
+        "DDI-ADVISE": 6,
+        "DDI-EFFECT": 10,
+        "DDI-INT": 4,
+        "DDI-MECHANISM": 7
+      },
+      "augmentation_type_counts": {
+        "hardcase": 12,
+        "margincase": 12,
+        "negative": 12,
+        "paraphrase": 12
+      },
+      "relations_per_sample": {
+        "min": 0,
+        "max": 3,
+        "mean": 0.8958333333333334,
+        "median": 0.5
+      },
+      "unique_entity_counts": {
+        "min": 0,
+        "max": 4,
+        "mean": 1.2916666666666667,
+        "median": 1.0
+      },
+      "word_lengths": {
+        "min": 9,
+        "max": 34,
+        "mean": 20.6875,
+        "median": 19.0
+      },
+      "long_gap_relations": 26,
+      "marker_counts": {
+        "conditional": 5,
+        "coordination": 42,
+        "negation": 20,
+        "speculative": 3
+      },
+      "sample_errors": []
+    },
+    "final_augmentations": {
+      "num_rows": 64,
+      "parse_failures": 0,
+      "empty_user": 0,
+      "empty_assistant": 0,
+      "invalid_labels": 0,
+      "entity_substring_issues": 0,
+      "duplicate_text_examples": 0,
+      "relation_counts": {
+        "ADE": 16,
+        "DDI-ADVISE": 9,
+        "DDI-EFFECT": 11,
+        "DDI-INT": 13,
+        "DDI-MECHANISM": 9
+      },
+      "augmentation_type_counts": {
+        "hardcase": 16,
+        "margincase": 16,
+        "negative": 16,
+        "paraphrase": 16
+      },
+      "relations_per_sample": {
+        "min": 0,
+        "max": 3,
+        "mean": 0.90625,
+        "median": 0.5
+      },
+      "unique_entity_counts": {
+        "min": 0,
+        "max": 4,
+        "mean": 1.328125,
+        "median": 1.0
+      },
+      "word_lengths": {
+        "min": 9,
+        "max": 34,
+        "mean": 20.859375,
+        "median": 19.0
+      },
+      "long_gap_relations": 38,
+      "marker_counts": {
+        "conditional": 6,
+        "coordination": 58,
+        "negation": 27,
+        "speculative": 5
+      },
+      "sample_errors": []
+    },
+    "final_train": {
+      "num_rows": 3976,
+      "parse_failures": 0,
+      "empty_user": 0,
+      "empty_assistant": 0,
+      "invalid_labels": 0,
+      "entity_substring_issues": 0,
+      "duplicate_text_examples": 2,
+      "relation_counts": {
+        "ADE": 5385,
+        "DDI-ADVISE": 749,
+        "DDI-EFFECT": 1486,
+        "DDI-INT": 195,
+        "DDI-MECHANISM": 1161
+      },
+      "augmentation_type_counts": {},
+      "relations_per_sample": {
+        "min": 0,
+        "max": 89,
+        "mean": 2.2575452716297786,
+        "median": 1.0
+      },
+      "unique_entity_counts": {
+        "min": 0,
+        "max": 84,
+        "mean": 3.1554325955734406,
+        "median": 2.0
+      },
+      "word_lengths": {
+        "min": 2,
+        "max": 1224,
+        "mean": 41.11569416498994,
+        "median": 18.0
+      },
+      "long_gap_relations": 6725,
+      "marker_counts": {
+        "conditional": 533,
+        "coordination": 2340,
+        "negation": 499,
+        "speculative": 659
+      },
+      "sample_errors": []
+    }
+  },
+  "overlaps": {
+    "original_train_vs_validation_exact": [
+      "corticotropin may accentuate the electrolyte loss associated with diuretic therapy.",
+      "interactions for vitamin d analogues (vitamin d2, vitamin d3, calcitriol, and calcidiol): cholestyramine: cholestyramine has been reported to reduce intestinal absorption of fat soluble vitamins; as such it may impair intestinal absorption of any of vitamin d. phenytoin/phenobarbital: the coadministration of phenytoin or phenobarbital will not affect plasma concentrations of vitamin d, but may reduce endogenous plasma levels of calcitriol/ergocalcitriol by accelerating metabolism. since blood level of calcitriol/ergocalcitriol will be reduced, higher doses of rocaltrol may be necessary if these drugs are administered simultaneously. thiazides: thiazides are known to induce hypercalcemia by the reduction of calcium excretion in urine. some reports have shown that the concomitant administration of thiazides with vitamin d causes hypercalcemia. therefore, precaution should be taken when coadministration is necessary. digitalis: vitamin d dosage must be determined with care in patients undergoing treatment with digitalis, as hypercalcemia in such patients may precipitate cardiac arrhythmias. ketoconazole: ketoconazole may inhibit both synthetic and catabolic enzymes of vitamin d. reductions in serum endogenous vitamin d concentrations have been observed following the administration of 300 mg/day to 1200 mg/day ketoconazole for a week to healthy men. however, in vivo drug interaction studies of ketoconazole with vitamin d have not been investigated. corticosteroids: a relationship of functional antagonism exists between vitamin d analogues, which promote calcium absorption, and corticosteroids, which inhibit calcium absorption. phosphate-binding agents: since vitamin d also has an effect on phosphate transport in the intestine, kidneys and bones, the dosage of phosphate-binding agents must be adjusted in accordance with the serum phosphate concentration. vitamin d: the coadministration of any of the vitamin d analogues should be avoided as this could create possible additive effects and hypercalcemia. calcium supplements: uncontrolled intake of additional calcium-containing preparations should be avoided. magnesium: magnesium-containing preparations (eg, antacids) may cause hypermagnesemia and should therefore not be taken during therapy with vitamin d by patients on chronic renal dialysis."
+    ],
+    "original_train_vs_test_exact": [
+      "barbiturates may decrease the effectiveness of oral contraceptives, certain antibiotics, quinidine, theophylline, corticosteroids, anticoagulants, and beta blockers.",
+      "tetracycline, a bacteriostatic antibiotic, may antagonize the bactericidal effect of penicillin and concurrent use of these drugs should be avoided."
+    ],
+    "validation_vs_test_exact": [],
+    "final_train_vs_validation_exact": [],
+    "final_train_vs_test_exact": [],
+    "augmentations_vs_validation_exact": [],
+    "augmentations_vs_test_exact": []
+  },
+  "augmentation_group_stats": {
+    "paraphrase": {
+      "num_rows": 16,
+      "positive_rows": 16,
+      "empty_rows": 0,
+      "multi_relation_rows": 10,
+      "complex_sentence_rows": 1,
+      "relation_counts": {
+        "ADE": 9,
+        "DDI-ADVISE": 4,
+        "DDI-EFFECT": 3,
+        "DDI-INT": 6,
+        "DDI-MECHANISM": 5
+      }
+    },
+    "negative": {
+      "num_rows": 16,
+      "positive_rows": 0,
+      "empty_rows": 16,
+      "multi_relation_rows": 0,
+      "complex_sentence_rows": 0,
+      "relation_counts": {}
+    },
+    "hardcase": {
+      "num_rows": 16,
+      "positive_rows": 16,
+      "empty_rows": 0,
+      "multi_relation_rows": 12,
+      "complex_sentence_rows": 15,
+      "relation_counts": {
+        "ADE": 7,
+        "DDI-ADVISE": 5,
+        "DDI-EFFECT": 8,
+        "DDI-INT": 7,
+        "DDI-MECHANISM": 4
+      }
+    },
+    "margincase": {
+      "num_rows": 16,
+      "positive_rows": 0,
+      "empty_rows": 16,
+      "multi_relation_rows": 0,
+      "complex_sentence_rows": 1,
+      "relation_counts": {}
+    }
+  },
+  "final_augmentation_near_duplicates": 0,
+  "final_augmentation_near_duplicate_examples": [],
+  "tokenizer_backed_statistics": {
+    "original_train": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train.jsonl",
+      "num_rows": 3917,
+      "label_counts": {
+        "ADE": 5369,
+        "DDI-ADVISE": 744,
+        "DDI-EFFECT": 1489,
+        "DDI-INT": 182,
+        "DDI-MECHANISM": 1159
+      },
+      "raw_relation_total": 9109,
+      "normalized_relation_total": 8943,
+      "duplicate_relation_examples": 93,
+      "relations_per_example": {
+        "min": 1,
+        "max": 89,
+        "mean": 2.2831248404391116,
+        "median": 1.0,
+        "p90": 4,
+        "p95": 7,
+        "p99": 20
+      },
+      "user_word_lengths": {
+        "min": 2,
+        "max": 1224,
+        "mean": 41.565994383456726,
+        "median": 18.0,
+        "p90": 53,
+        "p95": 184,
+        "p99": 558
+      },
+      "user_char_lengths": {
+        "min": 22,
+        "max": 9036,
+        "mean": 302.97957620628034,
+        "median": 134.0,
+        "p90": 377,
+        "p95": 1300,
+        "p99": 3992
+      },
+      "target_char_lengths": {
+        "min": 64,
+        "max": 8109,
+        "mean": 202.6190962471279,
+        "median": 97.0,
+        "p90": 351,
+        "p95": 615,
+        "p99": 1827
+      },
+      "prompt_token_lengths": {
+        "min": 187,
+        "max": 2329,
+        "mean": 250.73908603523105,
+        "median": 210.0,
+        "p90": 264,
+        "p95": 490,
+        "p99": 1139
+      },
+      "full_token_lengths": {
+        "min": 210,
+        "max": 3874,
+        "mean": 308.07122798059737,
+        "median": 243.0,
+        "p90": 381,
+        "p95": 635,
+        "p99": 1655
+      },
+      "target_token_lengths": {
+        "min": 21,
+        "max": 2173,
+        "mean": 57.33214194536635,
+        "median": 29.0,
+        "p90": 95,
+        "p95": 169,
+        "p99": 500
+      },
+      "examples_over_max_length": 0,
+      "examples_over_max_length_rate": 0.0,
+      "max_length": 4096
+    },
+    "final_train": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train.jsonl",
+      "num_rows": 3976,
+      "label_counts": {
+        "ADE": 5385,
+        "DDI-ADVISE": 749,
+        "DDI-EFFECT": 1486,
+        "DDI-INT": 195,
+        "DDI-MECHANISM": 1161
+      },
+      "raw_relation_total": 9142,
+      "normalized_relation_total": 8976,
+      "duplicate_relation_examples": 93,
+      "relations_per_example": {
+        "min": 0,
+        "max": 89,
+        "mean": 2.2575452716297786,
+        "median": 1.0,
+        "p90": 4,
+        "p95": 7,
+        "p99": 20
+      },
+      "user_word_lengths": {
+        "min": 2,
+        "max": 1224,
+        "mean": 41.11569416498994,
+        "median": 18.0,
+        "p90": 51,
+        "p95": 178,
+        "p99": 552
+      },
+      "user_char_lengths": {
+        "min": 22,
+        "max": 9036,
+        "mean": 299.72258551307846,
+        "median": 134.0,
+        "p90": 367,
+        "p95": 1279,
+        "p99": 3968
+      },
+      "target_char_lengths": {
+        "min": 2,
+        "max": 8109,
+        "mean": 200.40266599597587,
+        "median": 97.0,
+        "p90": 348,
+        "p95": 603,
+        "p99": 1783
+      },
+      "prompt_token_lengths": {
+        "min": 187,
+        "max": 2329,
+        "mean": 249.95925553319918,
+        "median": 210.0,
+        "p90": 261,
+        "p95": 482,
+        "p99": 1113
+      },
+      "full_token_lengths": {
+        "min": 202,
+        "max": 3874,
+        "mean": 306.7017102615694,
+        "median": 243.0,
+        "p90": 372,
+        "p95": 616,
+        "p99": 1587
+      },
+      "target_token_lengths": {
+        "min": 3,
+        "max": 2173,
+        "mean": 56.74245472837022,
+        "median": 29.0,
+        "p90": 94,
+        "p95": 161,
+        "p99": 492
+      },
+      "examples_over_max_length": 0,
+      "examples_over_max_length_rate": 0.0,
+      "max_length": 4096
+    },
+    "validation": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_validation.jsonl",
+      "num_rows": 436,
+      "label_counts": {
+        "ADE": 579,
+        "DDI-ADVISE": 65,
+        "DDI-EFFECT": 125,
+        "DDI-INT": 7,
+        "DDI-MECHANISM": 82
+      },
+      "raw_relation_total": 875,
+      "normalized_relation_total": 858,
+      "duplicate_relation_examples": 11,
+      "relations_per_example": {
+        "min": 1,
+        "max": 28,
+        "mean": 1.9678899082568808,
+        "median": 1.0,
+        "p90": 3,
+        "p95": 5,
+        "p99": 12
+      },
+      "user_word_lengths": {
+        "min": 2,
+        "max": 730,
+        "mean": 35.555045871559635,
+        "median": 18.0,
+        "p90": 49,
+        "p95": 153,
+        "p99": 323
+      },
+      "user_char_lengths": {
+        "min": 24,
+        "max": 5237,
+        "mean": 258.60779816513764,
+        "median": 132.0,
+        "p90": 342,
+        "p95": 1072,
+        "p99": 2326
+      },
+      "target_char_lengths": {
+        "min": 65,
+        "max": 2453,
+        "mean": 175.19954128440367,
+        "median": 97.0,
+        "p90": 290,
+        "p95": 453,
+        "p99": 1069
+      },
+      "prompt_token_lengths": {
+        "min": 187,
+        "max": 1400,
+        "mean": 239.77293577981652,
+        "median": 209.5,
+        "p90": 257,
+        "p95": 412,
+        "p99": 775
+      },
+      "full_token_lengths": {
+        "min": 211,
+        "max": 2034,
+        "mean": 289.2821100917431,
+        "median": 243.0,
+        "p90": 349,
+        "p95": 526,
+        "p99": 1085
+      },
+      "target_token_lengths": {
+        "min": 21,
+        "max": 687,
+        "mean": 49.50917431192661,
+        "median": 29.0,
+        "p90": 83,
+        "p95": 123,
+        "p99": 310
+      },
+      "examples_over_max_length": 0,
+      "examples_over_max_length_rate": 0.0,
+      "max_length": 4096
+    },
+    "test": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_test.jsonl",
+      "num_rows": 619,
+      "label_counts": {
+        "ADE": 668,
+        "DDI-ADVISE": 216,
+        "DDI-EFFECT": 341,
+        "DDI-INT": 96,
+        "DDI-MECHANISM": 290
+      },
+      "raw_relation_total": 1648,
+      "normalized_relation_total": 1611,
+      "duplicate_relation_examples": 18,
+      "relations_per_example": {
+        "min": 1,
+        "max": 37,
+        "mean": 2.602584814216478,
+        "median": 1.0,
+        "p90": 6,
+        "p95": 8,
+        "p99": 18
+      },
+      "user_word_lengths": {
+        "min": 2,
+        "max": 799,
+        "mean": 54.019386106623585,
+        "median": 22.0,
+        "p90": 156,
+        "p95": 217,
+        "p99": 381
+      },
+      "user_char_lengths": {
+        "min": 17,
+        "max": 6188,
+        "mean": 396.24555735056543,
+        "median": 155.0,
+        "p90": 1128,
+        "p95": 1597,
+        "p99": 2796
+      },
+      "target_char_lengths": {
+        "min": 70,
+        "max": 3315,
+        "mean": 232.7156704361874,
+        "median": 108.0,
+        "p90": 504,
+        "p95": 756,
+        "p99": 1552
+      },
+      "prompt_token_lengths": {
+        "min": 186,
+        "max": 1669,
+        "mean": 273.08885298869143,
+        "median": 215.0,
+        "p90": 430,
+        "p95": 552,
+        "p99": 873
+      },
+      "full_token_lengths": {
+        "min": 209,
+        "max": 2530,
+        "mean": 339.6526655896607,
+        "median": 255.0,
+        "p90": 587,
+        "p95": 719,
+        "p99": 1231
+      },
+      "target_token_lengths": {
+        "min": 21,
+        "max": 913,
+        "mean": 66.5638126009693,
+        "median": 32.0,
+        "p90": 139,
+        "p95": 212,
+        "p99": 456
+      },
+      "examples_over_max_length": 0,
+      "examples_over_max_length_rate": 0.0,
+      "max_length": 4096
+    },
+    "final_augmentations": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train_augmentations.jsonl",
+      "num_rows": 64,
+      "label_counts": {
+        "ADE": 16,
+        "DDI-ADVISE": 9,
+        "DDI-EFFECT": 11,
+        "DDI-INT": 13,
+        "DDI-MECHANISM": 9
+      },
+      "raw_relation_total": 58,
+      "normalized_relation_total": 58,
+      "duplicate_relation_examples": 0,
+      "relations_per_example": {
+        "min": 0,
+        "max": 3,
+        "mean": 0.90625,
+        "median": 0.5,
+        "p90": 2,
+        "p95": 3,
+        "p99": 3
+      },
+      "user_word_lengths": {
+        "min": 9,
+        "max": 34,
+        "mean": 20.859375,
+        "median": 19.0,
+        "p90": 30,
+        "p95": 32,
+        "p99": 33
+      },
+      "user_char_lengths": {
+        "min": 68,
+        "max": 239,
+        "mean": 155.84375,
+        "median": 150.5,
+        "p90": 226,
+        "p95": 228,
+        "p99": 237
+      },
+      "target_char_lengths": {
+        "min": 2,
+        "max": 297,
+        "mean": 83.75,
+        "median": 40.0,
+        "p90": 196,
+        "p95": 277,
+        "p99": 282
+      },
+      "prompt_token_lengths": {
+        "min": 195,
+        "max": 234,
+        "mean": 213.375,
+        "median": 211.5,
+        "p90": 230,
+        "p95": 232,
+        "p99": 233
+      },
+      "full_token_lengths": {
+        "min": 202,
+        "max": 312,
+        "mean": 239.21875,
+        "median": 221.0,
+        "p90": 288,
+        "p95": 293,
+        "p99": 306
+      },
+      "target_token_lengths": {
+        "min": 3,
+        "max": 84,
+        "mean": 25.84375,
+        "median": 14.0,
+        "p90": 59,
+        "p95": 75,
+        "p99": 81
+      },
+      "examples_over_max_length": 0,
+      "examples_over_max_length_rate": 0.0,
+      "max_length": 4096
+    }
+  },
+  "entity_type_schema": null
+}

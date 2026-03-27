@@ -1,3 +1,5 @@
+"""prompt 组装与 chat template 适配工具。"""
+
 import inspect
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -37,6 +39,7 @@ Output rules:
 
 
 def extract_message_content(messages: List[Dict[str, Any]], role: str) -> str:
+    """从消息数组中取出指定角色的第一条内容。"""
     for message in messages:
         if message.get("role") == role:
             return str(message.get("content", "")).strip()
@@ -44,12 +47,14 @@ def extract_message_content(messages: List[Dict[str, Any]], role: str) -> str:
 
 
 def load_system_prompt(system_prompt_path: Optional[str] = None) -> str:
+    """优先加载外部 prompt 文件，否则退回内置默认 prompt。"""
     if system_prompt_path:
         return Path(system_prompt_path).read_text(encoding="utf-8").strip()
     return DEFAULT_SYSTEM_PROMPT.strip()
 
 
 def build_messages(system_prompt: str, user_text: str, assistant_text: Optional[str] = None) -> List[Dict[str, str]]:
+    """构建标准 ChatML 风格消息列表。"""
     messages = [
         {"role": "system", "content": system_prompt.strip()},
         {"role": "user", "content": user_text.strip()},
@@ -60,15 +65,18 @@ def build_messages(system_prompt: str, user_text: str, assistant_text: Optional[
 
 
 def supports_chat_template(tokenizer: Any) -> bool:
+    """判断 tokenizer 是否暴露 HF chat template 接口。"""
     return callable(getattr(tokenizer, "apply_chat_template", None))
 
 
 def supports_assistant_tokens_mask(tokenizer: Any) -> bool:
+    """判断 tokenizer 的 chat template 是否能直接返回 assistant mask。"""
     chat_template = getattr(tokenizer, "chat_template", None)
     return isinstance(chat_template, str) and "{% generation" in chat_template
 
 
 def should_try_enable_thinking(tokenizer: Any, enable_thinking: Optional[bool]) -> bool:
+    """判断是否值得尝试把 `enable_thinking` 透传给 tokenizer。"""
     if enable_thinking is None:
         return False
 
@@ -96,6 +104,7 @@ def apply_chat_template(
     return_assistant_tokens_mask: bool = False,
     enable_thinking: Optional[bool] = None,
 ) -> Any:
+    """统一包装 tokenizer.apply_chat_template，兼容不同 tokenizer 能力差异。"""
     if not supports_chat_template(tokenizer):
         raise ValueError("Tokenizer does not expose apply_chat_template().")
 

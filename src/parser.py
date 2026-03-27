@@ -1,3 +1,12 @@
+"""预测结果解析与评估工具。
+
+这个模块把模型原始字符串输出转换成统一关系结构，并在此基础上计算：
+- 解析成功率
+- exact match
+- micro precision / recall / F1
+- 各标签粒度指标
+"""
+
 from __future__ import annotations
 
 import ast
@@ -59,6 +68,7 @@ CODE_FENCE_RE = re.compile(r"```(?:json)?\s*(.*?)```", flags=re.IGNORECASE | re.
 
 @dataclass
 class ParsedPrediction:
+    """单条模型输出在解析后的标准表示。"""
     relations: List[Dict[str, str]]
     status: str
     failure_reason: Optional[str]
@@ -67,6 +77,7 @@ class ParsedPrediction:
 
 @dataclass
 class DatasetExample:
+    """推理阶段使用的轻量样本对象。"""
     sample_id: str
     split: str
     system_prompt: str
@@ -75,10 +86,12 @@ class DatasetExample:
 
 
 def normalize_text(value: Any) -> str:
+    """统一折叠空白，避免文本细节差异影响对齐。"""
     return " ".join(str(value).strip().split())
 
 
 def normalize_label(raw_label: Any) -> str:
+    """把模型输出里的各种标签写法折叠到规范标签。"""
     normalized = normalize_text(raw_label).replace("_", " ").replace("-", " ").upper()
     normalized = " ".join(normalized.split())
     if normalized not in LABEL_ALIASES:
@@ -87,6 +100,7 @@ def normalize_label(raw_label: Any) -> str:
 
 
 def normalize_relation_item(item: Dict[str, Any]) -> Dict[str, str]:
+    """把关系对象的别名字段统一到仓库标准字段名。"""
     normalized_item: Dict[str, str] = {}
     for target_key, aliases in RELATION_KEYS.items():
         raw_value: Any = ""
@@ -102,6 +116,7 @@ def normalize_relation_item(item: Dict[str, Any]) -> Dict[str, str]:
 
 
 def normalize_relation_list(relations: Sequence[Dict[str, Any]]) -> List[Dict[str, str]]:
+    """对关系列表做字段规范化、去重和稳定排序。"""
     deduplicated: Dict[Tuple[str, str, str], Dict[str, str]] = {}
     for relation in relations:
         normalized = normalize_relation_item(relation)
@@ -115,6 +130,7 @@ def normalize_relation_list(relations: Sequence[Dict[str, Any]]) -> List[Dict[st
 
 
 def serialize_relations(relations: Sequence[Dict[str, Any]]) -> str:
+    """把关系列表序列化成稳定 JSON，方便对比和缓存。"""
     return json.dumps(
         normalize_relation_list(relations),
         ensure_ascii=False,
@@ -124,6 +140,7 @@ def serialize_relations(relations: Sequence[Dict[str, Any]]) -> str:
 
 
 def _strip_generation_noise(text: str) -> str:
+    """移除 `<think>` 块和 markdown code fence 等生成噪声。"""
     cleaned = THINK_BLOCK_RE.sub("", text or "").strip()
     if not cleaned:
         return cleaned
@@ -134,6 +151,7 @@ def _strip_generation_noise(text: str) -> str:
 
 
 def _iter_json_candidates(text: str) -> Iterable[str]:
+    """从原始输出里尽量枚举可能的 JSON 候选片段。"""
     cleaned = _strip_generation_noise(text)
     if not cleaned:
         return
@@ -159,6 +177,7 @@ def _iter_json_candidates(text: str) -> Iterable[str]:
 
 
 def _coerce_candidate_to_relation_payload(candidate: Any) -> List[Dict[str, Any]]:
+    """把不同形态的候选 JSON 统一提取为“关系列表”。"""
     if isinstance(candidate, list):
         return candidate
     if isinstance(candidate, dict):
@@ -173,6 +192,14 @@ def _coerce_candidate_to_relation_payload(candidate: Any) -> List[Dict[str, Any]
 
 
 def parse_prediction_text(text: str) -> ParsedPrediction:
+    """尽最大努力从模型输出中恢复关系列表。
+
+    解析顺序大致是：
+    1. 去掉思考文本和 markdown 包装
+    2. 枚举可能的 JSON 片段
+    3. 先尝试 `json.loads`，失败再退到 `ast.literal_eval`
+    4. 统一字段名、标签名并构造结构化结果
+    """
     cleaned = _strip_generation_noise(text)
     if not cleaned:
         return ParsedPrediction(relations=[], status="parse_failure", failure_reason="empty_output", raw_candidate=None)
@@ -211,6 +238,7 @@ def parse_prediction_text(text: str) -> ParsedPrediction:
 
 
 def load_dataset_examples(path: Path, *, split: str, limit: Optional[int] = None) -> List[DatasetExample]:
+    """把 ChatML JSONL 加载为推理 / 评估阶段的 `DatasetExample` 列表。"""
     rows = read_jsonl(path)
     if limit is not None:
         rows = rows[:limit]
@@ -244,6 +272,7 @@ def load_dataset_examples(path: Path, *, split: str, limit: Optional[int] = None
 
 
 def relation_set(relations: Sequence[Dict[str, Any]]) -> set[Tuple[str, str, str]]:
+    """把关系列表转换成集合，便于做集合级别比较。"""
     normalized = normalize_relation_list(relations)
     return {
         (
@@ -256,6 +285,7 @@ def relation_set(relations: Sequence[Dict[str, Any]]) -> set[Tuple[str, str, str
 
 
 def evaluate_prediction_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    """在样本列表上计算解析率、EM 和 micro / per-label 指标。"""
     total_samples = len(rows)
     parsed_samples = 0
     exact_matches = 0
@@ -288,6 +318,7 @@ def evaluate_prediction_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         if gold_set == pred_set:
             exact_matches += 1
 
+        # 这里采用集合级比较，要求 label、head、tail 三元组全部一致才算命中。
         row_tp = gold_set & pred_set
         row_fp = pred_set - gold_set
         row_fn = gold_set - pred_set
@@ -353,6 +384,7 @@ def evaluate_prediction_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def canonicalize_prediction_row(row: Dict[str, Any]) -> Dict[str, Any]:
+    """兼容不同历史预测格式，统一整理成当前评估格式。"""
     normalized_row = dict(row)
 
     gold_relations = row.get("gold_relations", [])
@@ -384,6 +416,7 @@ def canonicalize_prediction_row(row: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def format_metrics_report(metrics: Dict[str, Any], *, prediction_path: Optional[Path] = None) -> str:
+    """把指标字典格式化成便于人工阅读的文本报告。"""
     lines = ["=" * 80]
     if prediction_path is not None:
         lines.append(f"Prediction file: {prediction_path}")

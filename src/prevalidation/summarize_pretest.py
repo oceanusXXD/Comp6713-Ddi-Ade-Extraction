@@ -1,3 +1,5 @@
+"""汇总旧版预验证结果的脚本。"""
+
 import argparse
 import json
 from pathlib import Path
@@ -5,6 +7,7 @@ from typing import Any, Dict, List, Set, Tuple
 
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
+    """读取 JSONL 文件。"""
     rows = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -15,10 +18,12 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 
 def normalize_text(s: str) -> str:
+    """转小写并折叠空白。"""
     return " ".join(str(s).strip().lower().split())
 
 
 def relations_to_set(relations: List[Dict[str, Any]]) -> Set[Tuple[str, str, str]]:
+    """把关系列表转换成集合，便于做集合级比较。"""
     result = set()
     for r in relations or []:
         head = normalize_text(r.get("head_entity", ""))
@@ -30,6 +35,7 @@ def relations_to_set(relations: List[Dict[str, Any]]) -> Set[Tuple[str, str, str
 
 
 def main() -> None:
+    """读取旧版预测文件并输出核心指标。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--pred_path", type=str, required=True)
     args = parser.parse_args()

@@ -1,3 +1,5 @@
+"""规则基线自动调参脚本。"""
+
 import argparse
 import json
 import itertools
@@ -18,6 +20,7 @@ from src.baseline.run_baseline import (
 
 
 def relations_to_set(relations: List[Dict[str, Any]]) -> Set[Tuple[str, str, str]]:
+    """把关系列表转换成集合。"""
     result = set()
     if not isinstance(relations, list):
         return result
@@ -43,6 +46,7 @@ def evaluate_rows(
     effect_lexicon: List[str],
     config: Dict[str, Any],
 ) -> Dict[str, float]:
+    """评估某个规则配置在一批样本上的表现。"""
     tp = fp = fn = 0
     exact_match_count = 0
 
@@ -91,6 +95,7 @@ def evaluate_rows(
 
 
 def main() -> None:
+    """遍历规则搜索空间并保存最佳配置。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, default="data/merged_chatml_validation.jsonl")
     parser.add_argument("--drug_lexicon_path", type=str, default="resources/baseline/drug_lexicon.json")
@@ -112,7 +117,7 @@ def main() -> None:
 
     nlp = spacy.load("en_core_web_sm")
 
-    # ========= search space =========
+    # ========= 搜索空间 =========
     min_effect_len_options = [2, 3]
     min_drug_len_options = [2, 3]
     max_drugs_per_sent_options = [4, 6, 8]

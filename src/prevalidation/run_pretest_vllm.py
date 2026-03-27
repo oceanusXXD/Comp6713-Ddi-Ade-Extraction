@@ -1,3 +1,5 @@
+"""使用 vLLM 后端做旧版预验证。"""
+
 import argparse
 import json
 import re
@@ -8,6 +10,7 @@ from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
+    """读取 JSONL 文件。"""
     rows = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -17,21 +20,25 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 def write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
+    """写 JSONL 文件。"""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 def load_prompt(path: Path) -> str:
+    """读取 prompt 文本。"""
     return path.read_text(encoding="utf-8").strip()
 
 def extract_user_text(messages: List[Dict[str, Any]]) -> str:
+    """从 ChatML 中提取 user 文本。"""
     for msg in messages:
         if msg.get("role") == "user":
             return msg.get("content", "").strip()
     return ""
 
 def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """从 ChatML 中提取 assistant gold 关系。"""
     for msg in messages:
         if msg.get("role") == "assistant":
             content = msg.get("content", "").strip()
@@ -44,8 +51,9 @@ def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any
     return []
 
 def extract_json_list(text: str) -> Optional[List[Dict[str, Any]]]:
+    """尝试从输出文本中恢复 JSON list。"""
     text = text.strip()
-    # Remove <think>...</think> blocks if present
+    # 如果模型输出里带有 <think>...</think>，先去掉再解析 JSON
     text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
     try:
         parsed = json.loads(text)
@@ -67,12 +75,14 @@ def extract_json_list(text: str) -> Optional[List[Dict[str, Any]]]:
     return None
 
 def build_messages(system_prompt: str, user_text: str) -> List[Dict[str, str]]:
+    """构造对话消息。"""
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_text},
     ]
 
 def main() -> None:
+    """vLLM 预验证主流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, default="data/merged_chatml_test.jsonl")
     parser.add_argument("--prompt_path", type=str, default="src/prevalidation/prompt.txt")

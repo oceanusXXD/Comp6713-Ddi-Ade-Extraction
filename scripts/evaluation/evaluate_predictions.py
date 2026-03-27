@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+"""通用预测评估脚本。
+
+它既能评估当前主推理脚本产出的 prediction jsonl，也兼容部分历史脚本格式，
+必要时还可以从 gold 数据集文件补回 gold_relations。
+"""
+
 import argparse
 import json
 import sys
@@ -20,6 +26,7 @@ from src.parser import (
 
 
 def parse_args() -> argparse.Namespace:
+    """解析评估命令行参数。"""
     parser = argparse.ArgumentParser(description="Evaluate ADE/DDI prediction jsonl files.")
     parser.add_argument(
         "--predictions-path",
@@ -55,6 +62,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def default_output_path(predictions_path: Path, suffix: str) -> Path:
+    """根据预测文件路径生成默认输出文件名。"""
     return predictions_path.with_name(f"{predictions_path.stem}{suffix}")
 
 
@@ -64,6 +72,7 @@ def attach_gold_labels(
     gold_path: Optional[Path],
     split: str,
 ) -> List[Dict[str, Any]]:
+    """在预测文件本身不带 gold 时，从 gold 数据集中补齐标签。"""
     if gold_path is None:
         return prediction_rows
 
@@ -86,6 +95,7 @@ def attach_gold_labels(
 
 
 def main() -> None:
+    """评估脚本主流程。"""
     args = parse_args()
     predictions_path = Path(args.predictions_path).expanduser().resolve()
     gold_path = Path(args.gold_path).expanduser().resolve() if args.gold_path else None

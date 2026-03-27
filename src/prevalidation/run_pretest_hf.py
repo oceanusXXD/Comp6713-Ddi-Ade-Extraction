@@ -1,3 +1,5 @@
+"""使用 Hugging Face 后端做旧版预验证。"""
+
 import argparse
 import json
 from pathlib import Path
@@ -8,6 +10,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
+    """读取 JSONL 文件。"""
     rows = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -18,6 +21,7 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 
 def write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
+    """写 JSONL 文件。"""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         for row in rows:
@@ -25,10 +29,12 @@ def write_jsonl(path: Path, rows: List[Dict[str, Any]]) -> None:
 
 
 def load_prompt(path: Path) -> str:
+    """读取 prompt 文本。"""
     return path.read_text(encoding="utf-8").strip()
 
 
 def extract_user_text(messages: List[Dict[str, Any]]) -> str:
+    """从 ChatML 中提取 user 文本。"""
     for msg in messages:
         if msg.get("role") == "user":
             return msg.get("content", "").strip()
@@ -36,6 +42,7 @@ def extract_user_text(messages: List[Dict[str, Any]]) -> str:
 
 
 def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """从 ChatML 中提取 assistant gold 关系。"""
     for msg in messages:
         if msg.get("role") == "assistant":
             content = msg.get("content", "").strip()
@@ -49,6 +56,7 @@ def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any
 
 
 def extract_json_list(text: str) -> Optional[List[Dict[str, Any]]]:
+    """尝试从模型输出中恢复 JSON list。"""
     text = text.strip()
 
     try:
@@ -73,6 +81,7 @@ def extract_json_list(text: str) -> Optional[List[Dict[str, Any]]]:
 
 
 def load_model_and_tokenizer(model_path_or_name: str):
+    """加载 Hugging Face 模型和 tokenizer。"""
     tokenizer = AutoTokenizer.from_pretrained(
         model_path_or_name,
         trust_remote_code=True,
@@ -89,6 +98,7 @@ def load_model_and_tokenizer(model_path_or_name: str):
 
 
 def build_messages(system_prompt: str, user_text: str) -> List[Dict[str, str]]:
+    """构造对话消息。"""
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_text},
@@ -129,6 +139,7 @@ def run_one_sample(
 
 
 def main() -> None:
+    """HF 预验证主流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input_path",

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""规则基线默认配置。"""
+
 DEFAULT_CONFIG = {
     "ADE_TRIGGERS": [
         "caused",

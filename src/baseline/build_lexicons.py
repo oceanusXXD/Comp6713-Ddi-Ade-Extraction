@@ -1,13 +1,16 @@
+"""从训练集提取规则基线词典。"""
+
 import argparse
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
-# 作用是从 train 提取：
-#   1. drug lexicon
-#   2. effect lexicon
+# 作用是从训练集提取：
+#   1. 药物词典
+#   2. effect 词典
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
+    """读取 JSONL 文件。"""
     rows = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -18,6 +21,7 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 
 def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """从 ChatML 中提取 assistant gold 关系列表。"""
     for msg in messages:
         if msg.get("role") == "assistant":
             content = msg.get("content", "").strip()
@@ -31,10 +35,12 @@ def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any
 
 
 def norm(s: str) -> str:
+    """转小写并折叠空白，便于去重。"""
     return " ".join(str(s).strip().lower().split())
 
 
 def main() -> None:
+    """扫描训练集并生成药物词典与 effect 词典。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, default="data/merged_chatml_train.jsonl")
     parser.add_argument("--output_dir", type=str, default="resources/baseline")

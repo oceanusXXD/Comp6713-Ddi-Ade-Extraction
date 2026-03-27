@@ -1,3 +1,9 @@
+"""数据集统计脚本。
+
+这个脚本通常用于训练前或数据整理后，快速输出某个 JSONL 文件的长度、
+token 分布和标签统计，结果会写成 JSON 供后续报告复用。
+"""
+
 import argparse
 import sys
 from pathlib import Path
@@ -13,11 +19,12 @@ from src.prompting import load_system_prompt
 
 
 def parse_args() -> argparse.Namespace:
+    """解析命令行参数。"""
     parser = argparse.ArgumentParser(description="Analyze ADE/DDI ChatML dataset statistics.")
     parser.add_argument(
         "--config",
         type=str,
-        default="configs/train_qwen3_8b_lora.yaml",
+        default="configs/qwen3_8b_lora_ddi_ade_final.yaml",
         help="Training config used to resolve tokenizer and max_seq_length.",
     )
     parser.add_argument(
@@ -42,6 +49,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """加载配置与 tokenizer，然后对指定数据集做统计。"""
     args = parse_args()
     config = load_training_config(args.config)
     tokenizer = load_tokenizer(config)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""rotary embedding 的最小兼容实现。"""
+
 from typing import Optional
 
 import torch
@@ -15,6 +17,7 @@ def apply_rotary(
     cu_seqlens: Optional[torch.Tensor] = None,
     max_seqlen: Optional[int] = None,
 ) -> torch.Tensor:
+    """对输入张量应用 rotary position embedding 旋转。"""
     del seqlen_offsets, cu_seqlens, max_seqlen
 
     output = x if inplace else x.clone()

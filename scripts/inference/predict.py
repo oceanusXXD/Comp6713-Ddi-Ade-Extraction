@@ -1,3 +1,10 @@
+"""仓库主推理入口。
+
+支持两类用法：
+1. 读取 JSONL 数据集做批量推理并顺手算指标。
+2. 直接输入一段原始文本做单样本推理。
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -36,11 +43,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
+    """解析推理命令行参数。"""
     parser = argparse.ArgumentParser(description="Run ADE/DDI extraction inference and evaluation.")
     parser.add_argument(
         "--config",
         type=str,
-        default="configs/infer_qwen3_8b.yaml",
+        default="configs/infer_qwen3_8b_lora_ddi_ade_final.yaml",
         help="Path to the inference YAML config.",
     )
     parser.add_argument("--split", type=str, default=None, help="Dataset split alias: dev|validation|test.")
@@ -92,6 +100,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def configure_logging() -> None:
+    """初始化日志。"""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -99,6 +108,7 @@ def configure_logging() -> None:
 
 
 def set_global_seed(seed: int, *, seed_cuda: bool = True) -> None:
+    """设置推理阶段随机种子。"""
     random.seed(seed)
     torch.manual_seed(seed)
     if seed_cuda and torch.cuda.is_available():
@@ -110,6 +120,7 @@ def build_single_example(
     *,
     system_prompt: Optional[str],
 ) -> DatasetExample:
+    """把单条原始文本包装成与批量推理一致的样本对象。"""
     return DatasetExample(
         sample_id="single_0000",
         split="single",
@@ -120,6 +131,7 @@ def build_single_example(
 
 
 def write_jsonl(path: Path, rows: Sequence[Dict[str, Any]]) -> None:
+    """把预测结果写成 JSONL。"""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         for row in rows:
@@ -127,6 +139,7 @@ def write_jsonl(path: Path, rows: Sequence[Dict[str, Any]]) -> None:
 
 
 def write_metrics_if_available(rows: Sequence[Dict[str, Any]], config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """如果预测结果里带 gold，就顺手计算并写出指标。"""
     if not rows:
         return None
     if not all("gold_relations" in row for row in rows):
@@ -153,9 +166,15 @@ def write_metrics_if_available(rows: Sequence[Dict[str, Any]], config: Dict[str,
 
 
 def main() -> None:
+    """推理脚本主流程。"""
     configure_logging()
     args = parse_args()
-    config = apply_cli_overrides(load_inference_config(args.config), args)
+    if Path(sys.prefix).resolve() != (PROJECT_ROOT / ".venv").resolve():
+        raise RuntimeError(
+            f"Please run inference with the repository virtualenv python. "
+            f"sys.prefix={Path(sys.prefix).resolve()} expected={(PROJECT_ROOT / '.venv').resolve()}"
+        )
+    config = apply_cli_overrides(load_inference_config(args.config, validate=False), args)
     if args.enable_thinking and args.disable_thinking:
         raise ValueError("Use at most one of --enable-thinking or --disable-thinking.")
     if args.enable_thinking:
@@ -166,6 +185,7 @@ def main() -> None:
     set_global_seed(config["seed"], seed_cuda=backend != "vllm")
 
     if args.input_text is not None:
+        # 单文本模式：不依赖数据文件，直接构造一个临时样本。
         system_prompt = args.system_prompt or load_system_prompt(
             str(config["system_prompt_path"]) if config.get("system_prompt_path") is not None else None
         )
@@ -176,6 +196,7 @@ def main() -> None:
             )
         ]
     else:
+        # 数据集模式：加载文件中的 gold_relations，便于推理后立即评估。
         input_path = config["data"].get("input_path")
         if input_path is None:
             split = config["data"].get("split", "dev")
