@@ -75,9 +75,9 @@
 - `checkpoint-*`：训练中的阶段性 checkpoint
 - `observability/`：训练过程记录、配置快照、参数统计、数据统计
 
-## `seen_style_core` 到底是什么意思
+## `seen_style_core` 
 
-`evaluate_datasets/seen_style_core/` 不是新的训练集，也不是当前主线默认验证集。它的作用是把仓库里已有的一套“同风格 held-out 文件”整理进 `evaluate_datasets/` 体系，方便统一做评测管理。
+`evaluate_datasets/seen_style_core/` held-out 文件”整理进 `evaluate_datasets/` 体系，方便统一做评测管理。
 
 它当前镜像的是：
 
@@ -89,13 +89,8 @@
 - `evaluate_datasets/seen_style_core/official_held_out/merged_chatml_validation.jsonl`
 - `evaluate_datasets/seen_style_core/official_held_out/merged_chatml_test.jsonl`
 
-一句话判断是否“用了”：
 
-- 主线训练：没用
-- 默认验证 / 默认推理：没直接用
-- 额外同风格评测：可以用
 
-所以，如果你只是跑当前主线配置，重点看的是 `data/processed/...final_augment/...`；如果你想补做“同风格额外评测”，再看 `evaluate_datasets/seen_style_core/`。
 
 ## 顶层文件和目录说明
 
