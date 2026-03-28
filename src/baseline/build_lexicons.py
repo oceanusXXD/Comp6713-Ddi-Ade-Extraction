@@ -1,16 +1,10 @@
-"""从训练集提取规则基线词典。"""
-
 import argparse
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
-# 作用是从训练集提取：
-#   1. 药物词典
-#   2. effect 词典
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
-    """读取 JSONL 文件。"""
     rows = []
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -21,7 +15,6 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 
 def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """从 ChatML 中提取 assistant gold 关系列表。"""
     for msg in messages:
         if msg.get("role") == "assistant":
             content = msg.get("content", "").strip()
@@ -35,15 +28,27 @@ def extract_gold_relations(messages: List[Dict[str, Any]]) -> List[Dict[str, Any
 
 
 def norm(s: str) -> str:
-    """转小写并折叠空白，便于去重。"""
     return " ".join(str(s).strip().lower().split())
 
 
+def load_drugbank_names(path: Path) -> Set[str]:
+    names: Set[str] = set()
+    if not path.exists():
+        return names
+
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            name = norm(line)
+            if name:
+                names.add(name)
+    return names
+
+
 def main() -> None:
-    """扫描训练集并生成药物词典与 effect 词典。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, default="data/merged_chatml_train.jsonl")
     parser.add_argument("--output_dir", type=str, default="resources/baseline")
+    parser.add_argument("--drugbank_path", type=str, default="")
     args = parser.parse_args()
 
     rows = read_jsonl(Path(args.input_path))
@@ -68,6 +73,14 @@ def main() -> None:
             elif rel_type.startswith("DDI") and tail:
                 drug_lexicon.add(tail)
 
+    train_drug_count = len(drug_lexicon)
+
+    drugbank_count = 0
+    if args.drugbank_path:
+        drugbank_names = load_drugbank_names(Path(args.drugbank_path))
+        drugbank_count = len(drugbank_names)
+        drug_lexicon.update(drugbank_names)
+
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -77,8 +90,12 @@ def main() -> None:
     with (out_dir / "effect_lexicon.json").open("w", encoding="utf-8") as f:
         json.dump(sorted(effect_lexicon), f, ensure_ascii=False, indent=2)
 
-    print(f"Saved drug lexicon: {out_dir / 'drug_lexicon.json'} ({len(drug_lexicon)} items)")
-    print(f"Saved effect lexicon: {out_dir / 'effect_lexicon.json'} ({len(effect_lexicon)} items)")
+    print(f"Train-derived drug lexicon size: {train_drug_count}")
+    print(f"DrugBank lexicon size: {drugbank_count}")
+    print(f"Merged drug lexicon size: {len(drug_lexicon)}")
+    print(f"Effect lexicon size: {len(effect_lexicon)}")
+    print(f"Saved drug lexicon: {out_dir / 'drug_lexicon.json'}")
+    print(f"Saved effect lexicon: {out_dir / 'effect_lexicon.json'}")
 
 
 if __name__ == "__main__":

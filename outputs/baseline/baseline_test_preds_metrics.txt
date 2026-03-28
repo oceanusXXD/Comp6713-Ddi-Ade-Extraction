@@ -3,8 +3,8 @@ Prediction file: outputs/baseline/baseline_test_preds.jsonl
 Total samples: 619
 JSON valid: 619/619 = 100.00%
 Exact match accuracy: 31/619 = 5.01%
-TP=108, FP=342, FN=1503
-Precision: 0.2400
-Recall:    0.0670
-F1:        0.1048
+TP=110, FP=401, FN=1501
+Precision: 0.2153
+Recall:    0.0683
+F1:        0.1037
 ================================================================================

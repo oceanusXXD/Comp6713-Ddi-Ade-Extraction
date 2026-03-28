@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-"""规则基线默认配置。"""
-
 DEFAULT_CONFIG = {
     "ADE_TRIGGERS": [
         "caused",
@@ -65,6 +63,6 @@ DEFAULT_CONFIG = {
     "MIN_EFFECT_LEN": 2,
     "MIN_DRUG_LEN": 2,
     "MAX_DRUGS_PER_SENT_FOR_DDI": 6,
+    "MAX_ADE_TOKEN_DISTANCE": 12,
+    "MAX_DDI_TOKEN_DISTANCE": 10,
 }
-MAX_ADE_TOKEN_DISTANCE = 12
-MAX_DDI_TOKEN_DISTANCE = 10

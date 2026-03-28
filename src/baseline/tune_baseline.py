@@ -1,5 +1,3 @@
-"""规则基线自动调参脚本。"""
-
 import argparse
 import json
 import itertools
@@ -20,7 +18,6 @@ from src.baseline.run_baseline import (
 
 
 def relations_to_set(relations: List[Dict[str, Any]]) -> Set[Tuple[str, str, str]]:
-    """把关系列表转换成集合。"""
     result = set()
     if not isinstance(relations, list):
         return result
@@ -46,7 +43,6 @@ def evaluate_rows(
     effect_lexicon: List[str],
     config: Dict[str, Any],
 ) -> Dict[str, float]:
-    """评估某个规则配置在一批样本上的表现。"""
     tp = fp = fn = 0
     exact_match_count = 0
 
@@ -95,7 +91,6 @@ def evaluate_rows(
 
 
 def main() -> None:
-    """遍历规则搜索空间并保存最佳配置。"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, default="data/merged_chatml_validation.jsonl")
     parser.add_argument("--drug_lexicon_path", type=str, default="resources/baseline/drug_lexicon.json")
@@ -117,39 +112,40 @@ def main() -> None:
 
     nlp = spacy.load("en_core_web_sm")
 
-    # ========= 搜索空间 =========
     min_effect_len_options = [2, 3]
-    min_drug_len_options = [2, 3]
-    max_drugs_per_sent_options = [4, 6, 8]
+    min_drug_len_options = [2]
+    max_drugs_per_sent_options = [4, 6]
+    max_ade_distance_options = [8, 12]
+    max_ddi_distance_options = [6, 10]
 
     ade_trigger_extra_options = [
         [],
         ["triggered by"],
-        ["secondary to"],
-        ["triggered by", "secondary to"],
     ]
 
     ddi_int_extra_options = [
         [],
-        ["combined with"],
     ]
 
     best_config = None
     best_metrics = None
     best_f1 = -1.0
-
     trial_id = 0
 
     for (
         min_effect_len,
         min_drug_len,
         max_drugs_per_sent,
+        max_ade_distance,
+        max_ddi_distance,
         ade_extra,
         ddi_int_extra,
     ) in itertools.product(
         min_effect_len_options,
         min_drug_len_options,
         max_drugs_per_sent_options,
+        max_ade_distance_options,
+        max_ddi_distance_options,
         ade_trigger_extra_options,
         ddi_int_extra_options,
     ):
@@ -159,6 +155,8 @@ def main() -> None:
         config["MIN_EFFECT_LEN"] = min_effect_len
         config["MIN_DRUG_LEN"] = min_drug_len
         config["MAX_DRUGS_PER_SENT_FOR_DDI"] = max_drugs_per_sent
+        config["MAX_ADE_TOKEN_DISTANCE"] = max_ade_distance
+        config["MAX_DDI_TOKEN_DISTANCE"] = max_ddi_distance
         config["ADE_TRIGGERS"] = list(DEFAULT_CONFIG["ADE_TRIGGERS"]) + list(ade_extra)
         config["DDI_INT_TRIGGERS"] = list(DEFAULT_CONFIG["DDI_INT_TRIGGERS"]) + list(ddi_int_extra)
 
@@ -175,6 +173,8 @@ def main() -> None:
             f"MIN_EFFECT_LEN={min_effect_len}, "
             f"MIN_DRUG_LEN={min_drug_len}, "
             f"MAX_DRUGS_PER_SENT_FOR_DDI={max_drugs_per_sent}, "
+            f"MAX_ADE_TOKEN_DISTANCE={max_ade_distance}, "
+            f"MAX_DDI_TOKEN_DISTANCE={max_ddi_distance}, "
             f"ADE_EXTRA={ade_extra}, "
             f"DDI_INT_EXTRA={ddi_int_extra} "
             f"=> F1={metrics['f1']:.4f}, "
@@ -205,3 +205,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    
