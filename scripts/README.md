@@ -1,39 +1,50 @@
 # 脚本目录说明
 
-这个目录放的是仓库的命令行入口脚本。大部分日常操作都从这里进入。
+这个目录集中放置仓库的命令行入口脚本。日常训练、推理、评估和数据整理都从这里进入。
 
-## 文件和子目录说明
+## 子目录一览
 
 ### `train/`
 
-- `train/train_finetune.py`
-  主训练脚本。负责读取训练配置、加载模型和 tokenizer、执行 dry run、正式训练、保存 checkpoint 和最终 adapter。
+- `train_finetune.py`
+  主训练入口。负责读取配置、加载模型与 tokenizer、编码检查、执行训练、保存 adapter 和观测文件。
 
 ### `inference/`
 
-- `inference/predict.py`
-  主推理脚本。支持批量数据推理、单条文本推理、切换 `transformers` / `vllm` 后端、输出预测文件和指标文件。
+- `predict.py`
+  主推理入口。支持批量数据推理与单文本推理，支持 `transformers` 和 `vllm` 两类后端。
 
 ### `evaluation/`
 
-- `evaluation/evaluate_predictions.py`
-  主评估脚本。对预测文件做解析、规范化和指标计算，输出 `.txt` 和 `.json` 结果。
-- `evaluation/evaluate_predictions_by_augmentation.py`
-  按 `augmentation_type` 分组评估预测结果，适合检查 `paraphrase`、`negative`、`hardcase`、`margincase` 各类增强样本的表现。
+- `evaluate_predictions.py`
+  通用预测评估脚本，计算文本报告和 JSON 指标。
+- `evaluate_predictions_by_augmentation.py`
+  按 `augmentation_type` 切分评估，适合分析增强样本表现。
+- `run_benchmark_suite.py`
+  统一跑整套 benchmark。
 
 ### `analysis/`
 
-- `analysis/analyze_dataset.py`
-  数据统计脚本，用来分析长度分布、token 统计和样本结构。
-- `analysis/audit_and_prepare_final_dataset.py`
-  数据审计与物化脚本，用来清洗数据、排查 split 污染、合并增强样本，并生成当前主线推荐数据版本。
-- `analysis/fetch_evaluate_datasets.py`
-  评测数据整理脚本，用来下载公开评测集、解压压缩包、生成 `evaluate_datasets/MANIFEST.json`，并构建 `seen_style_core/` 镜像。
+- `analyze_dataset.py`
+  数据统计与结构分析。
+- `audit_and_prepare_final_dataset.py`
+  数据审计与主线数据物化脚本。
+- `fetch_evaluate_datasets.py`
+  下载公开评测集、写 `evaluate_datasets/MANIFEST.json`，并构建 `seen_style_core/` 镜像。
 
 ### `experiments/`
 
-- `experiments/run_qwen3_lora_variant_benchmark.py`
-  变体实验脚本，用来批量训练并评估不同 LoRA 方案，自动写运行时配置、日志、预测结果和实验摘要。
+- `run_qwen3_lora_variant_benchmark.py`
+  批量训练与比较不同 LoRA 方案的实验脚本。
+
+## 推荐理解顺序
+
+- 想重建主线数据：先看 `analysis/audit_and_prepare_final_dataset.py`
+- 想训练模型：再看 `train/train_finetune.py`
+- 想跑推理：看 `inference/predict.py`
+- 想算指标：看 `evaluation/evaluate_predictions.py`
+- 想做整套 benchmark：看 `evaluation/run_benchmark_suite.py`
+- 想补充外部评测：看 `analysis/fetch_evaluate_datasets.py`
 
 ## 最常用命令
 
@@ -62,28 +73,19 @@
 
 ```bash
 .venv/bin/python scripts/evaluation/evaluate_predictions.py \
-  --predictions-path results/your_predictions.jsonl
+  --predictions-path results/inference_runs/your_predictions.jsonl
 ```
 
 ### 按增强类型做评估
 
 ```bash
 .venv/bin/python scripts/evaluation/evaluate_predictions_by_augmentation.py \
-  --predictions-path results/your_predictions.jsonl \
+  --predictions-path results/inference_runs/your_predictions.jsonl \
   --source-path data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train_augmentations.jsonl
 ```
 
-## 你应该怎么理解这些脚本
+## 使用建议
 
-- 想训练模型：
-  先看 `analysis/audit_and_prepare_final_dataset.py`，再看 `train/train_finetune.py`
-- 想跑模型：
-  看 `inference/predict.py`
-- 想算指标：
-  看 `evaluation/evaluate_predictions.py`
-- 想看数据质量：
-  看 `analysis/analyze_dataset.py`
-- 想补外部评测：
-  看 `analysis/fetch_evaluate_datasets.py`
-- 想批量对比不同训练变体：
-  看 `experiments/run_qwen3_lora_variant_benchmark.py`
+- 主线维护优先走 `analysis -> train -> inference -> evaluation` 这条路径。
+- 新脚本尽量放进已经存在的功能分组，不要再往 `scripts/` 顶层堆单文件。
+- 输出路径、数据路径和 README 说明应同步维护，避免脚本入口和仓库说明脱节。

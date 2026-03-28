@@ -11,7 +11,7 @@
 - 原始训练集：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train.jsonl`
 - 原始验证集：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_validation.jsonl`
 - 原始测试集：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_test.jsonl`
-- 现有增强 sidecar：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train_augmentations.jsonl`
+- 现有增强 sidecar：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/merged_chatml_train_augmentations.jsonl`
 - 最终增强 sidecar：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train_augmentations.jsonl`
 - 最终合并训练集：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train.jsonl`
 

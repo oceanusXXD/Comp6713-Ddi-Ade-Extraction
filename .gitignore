@@ -27,11 +27,28 @@ models/
 # Generated inference and evaluation artifacts
 results/*
 !results/README.md
-!results/*.txt
 !results/benchmark_suite_vllm_batch64_20260327/
 results/benchmark_suite_vllm_batch64_20260327/*
 !results/benchmark_suite_vllm_batch64_20260327/README.md
 !results/benchmark_suite_vllm_batch64_20260327/benchmark_analysis_zh.txt
+!results/metrics/
+results/metrics/*
+!results/metrics/README.md
+!results/metrics/model_snapshots/
+results/metrics/model_snapshots/*
+!results/metrics/model_snapshots/*.txt
+!results/metrics/augmentations/
+results/metrics/augmentations/*
+!results/metrics/augmentations/*.txt
+!results/metrics/test_set_sweeps/
+results/metrics/test_set_sweeps/*
+!results/metrics/test_set_sweeps/*.txt
+!results/inference_runs/
+results/inference_runs/*
+!results/inference_runs/README.md
+!results/prevalidation/
+results/prevalidation/*
+!results/prevalidation/README.md
 
 # Local evaluation bundles
 evaluate_datasets/**
@@ -49,4 +66,22 @@ outputs/*
 outputs/qwen3_8b_lora/*
 !outputs/qwen3_8b_lora/final_adapter/
 !outputs/qwen3_8b_lora/final_adapter/**
+!outputs/qwen3_8b_lora_ddi_ade_c5fc8c06/
+outputs/qwen3_8b_lora_ddi_ade_c5fc8c06/*
+!outputs/qwen3_8b_lora_ddi_ade_c5fc8c06/README.md
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/
+outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/*
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/README.md
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-620/
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1085/
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1232/
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/final_adapter/
+outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-620/*
+outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1085/*
+outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1232/*
+outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/final_adapter/*
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-620/README.md
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1085/README.md
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1232/README.md
+!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/final_adapter/README.md
 !results/benchmark_suite_vllm_batch64_20260327/summary.csv

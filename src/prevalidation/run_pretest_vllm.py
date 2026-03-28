@@ -98,7 +98,7 @@ def main() -> None:
     
     if args.output_path is None:
         safe_name = args.model_name.replace("/", "_")
-        output_path = Path(f"results/{safe_name}_preds.jsonl")
+        output_path = Path(f"results/prevalidation/{safe_name}_preds.jsonl")
     else:
         output_path = Path(args.output_path)
 

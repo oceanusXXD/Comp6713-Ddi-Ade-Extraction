@@ -1,107 +1,82 @@
 # 结果目录说明
 
-这个目录保存推理预测文件、指标文件和变体实验结果。它更像“实验记录区”，不是当前主线唯一输出源。
+这个目录保存推理预测、指标文件、benchmark 归档和实验结果。整理后，顶层不再堆放零散的指标文本，摘要指标统一收进了 `metrics/`。
 
-## 今日主线测试入口
+## 现在先看哪里
 
-如果你现在要回看 2026-03-27 这轮全量评测，优先看：
+### 当前最重要的综合 benchmark
 
 - `benchmark_suite_vllm_batch64_20260327/`
 
-这个目录保存了今天串行跑完的一整套 vLLM benchmark，覆盖：
+这是 2026-03-27 全量 vLLM benchmark 的主归档目录，仍然是结果查看首选入口。
 
-- `base`
-- `base+lora`
-- `base+rslora@620`
-- `base+rslora@930`
-- `base+rslora@1232`
+### 汇总型文本指标
 
-建议按下面顺序查看：
+- `metrics/model_snapshots/`
+  早期模型快照指标。
+- `metrics/augmentations/`
+  增强样本相关指标。
+- `metrics/test_set_sweeps/`
+  单测试集设置对比指标。
 
-- `benchmark_suite_vllm_batch64_20260327/summary.csv`
-  全量汇总表，适合做横向比较和后续画表。
-- `benchmark_suite_vllm_batch64_20260327/benchmark_analysis_zh.txt`
-  中文分析摘要，直接给出主任务、泛化和 guardrail 结论。
-- `benchmark_suite_vllm_batch64_20260327/<variant>/`
-  每个模型变体对应一个子目录，里面保留逐数据集的 `predictions.jsonl`、`metrics.json` 和 `metrics.txt`。
+### 未来默认推理输出
 
-这轮 benchmark 当前应视为 `results/` 下最重要的一组结果。
+- `inference_runs/`
+  默认推理脚本写预测和指标的目录。
 
-## 当前保留原则
+### 旧版预验证输出
 
-- `results/` 顶层默认只长期保留 `README.md` 和 `*.txt`
-- 顶层的 `json`、`jsonl`、非 README 的 `md` 结果文件已经清理
-- `variant_benchmark_*` 子目录主要保留实验结构、日志、运行配置和文本指标
-- benchmark 子目录里的 `*_validation_predictions.jsonl` 与 `*_validation_metrics.json` 已清理，优先保留 `*.txt`
+- `prevalidation/`
+  旧版预验证脚本默认写出的预测目录。
 
-## 顶层文件说明
+## 目录分工
+
+- `benchmark_suite_vllm_batch64_20260327/`
+  当前最重要的综合 benchmark 归档。
+- `benchmark_serial_vllm_batch64_20260327/`
+  串行 benchmark 归档。
+- `benchmarks/smoke/`
+  smoke benchmark 归档。
+- `variant_benchmark_*`
+  变体实验结果目录。
+- `metrics/`
+  顶层摘要型文本指标。
+- `inference_runs/`
+  未来常规推理输出。
+- `prevalidation/`
+  未来旧版预验证输出。
+
+## `metrics/` 下的内容
+
+### `metrics/model_snapshots/`
 
 - `NousResearch_Meta-Llama-3-8B-Instruct_preds_metrics.txt`
-  早期 `Meta-Llama-3-8B-Instruct` 预验证或基线对比指标。
 - `Qwen_Qwen3-4B-Instruct-2507_preds_metrics.txt`
-  `Qwen3-4B-Instruct-2507` 的指标记录。
 - `Qwen_Qwen3-8B_preds_metrics.txt`
-  `Qwen3-8B` 的指标记录。
 
-## 与增强样本相关的结果
+### `metrics/augmentations/`
 
 - `qwen3_8b_lora_ddi_ade_c5fc8c06_augmentations_metrics.txt`
-  增强样本集合上的文本指标摘要。
 
-## 与 vLLM batch 设置对比相关的结果
+### `metrics/test_set_sweeps/`
 
-当前顶层主要保留：
-
-- `test_metrics_vllm_batch64_*.txt`
-  不同设置下的测试集文本指标。
-
-这些文件更适合看“单一测试集上的设置差异”，不再是今天全量 benchmark 的主入口。
+这里保存原先散落在顶层的 `test_metrics_vllm_batch64_*.txt` 文件。
 
 常见后缀含义：
 
-- `base`：只用基座模型
-- `lora`：加载 LoRA adapter
-- `thinking` / `no_thinking`：是否开启思考模式
-- `512` / `1024` / `default2048`：生成长度设置
+- `base`
+  只加载基座模型
+- `lora`
+  加载 LoRA adapter
+- `thinking` / `no_thinking`
+  是否启用思考模式
+- `512` / `1024` / `default2048`
+  生成长度设置
 
-## `variant_benchmark_*` 子目录说明
+## 使用建议
 
-这些目录来自 `scripts/experiments/run_qwen3_lora_variant_benchmark.py`，用于比较不同 LoRA 变体。
-
-当前保留的实验目录包括：
-
-- `variant_benchmark_qwen3_8b_full/`
-- `variant_benchmark_qwen3_8b_full_final/`
-- `variant_benchmark_qwen3_8b_screen1e/`
-- `variant_benchmark_qwen3_8b_screen1e_venv/`
-- `variant_benchmark_qwen3_8b_screen1e_venv_rest/`
-
-已经清理的冒烟实验目录包括：
-
-- `variant_benchmark_qwen3_8b_envfix_smoke/`
-- `variant_benchmark_qwen3_8b_patch_smoke/`
-- `variant_benchmark_qwen3_8b_patch_smoke2/`
-- `variant_benchmark_qwen3_8b_smoke/`
-
-这类目录里常见文件和子目录：
-
-- `summary.json`
-  机器可读的实验汇总，主要作为本地分析中间产物。
-- `summary.md`
-  人类可读的实验汇总。
-- `*_validation_metrics.txt`
-  各变体的文本指标，属于优先保留结果。
-- `logs/`
-  训练和推理日志。
-- `runtime_configs/`
-  实验当时落盘的运行时配置。
-- `outputs/`
-  实验运行生成的 adapter、checkpoint 和中间输出。
-
-## 什么时候看这里
-
-- 想回看历史实验结果
-- 想知道某个设置下保留下来的文本指标在哪
-- 想做模型 / 配置之间的横向比较
-
-如果你只关心“当前主线应该怎么跑”，优先看 `configs/`、`outputs/` 和根目录 `README.md`。
+- 想回看完整 benchmark：优先看 `benchmark_suite_vllm_batch64_20260327/`
+- 想快速看单模型文本指标：看 `metrics/`
+- 想看未来默认推理输出：看 `inference_runs/`
+- 想看旧版预验证输出：看 `prevalidation/`
+- 想查实验过程：看 `variant_benchmark_*`

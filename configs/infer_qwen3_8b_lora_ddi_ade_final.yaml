@@ -36,6 +36,6 @@ vllm:
   disable_log_stats: true
 
 output:
-  predictions_path: results/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_predictions.jsonl
-  metrics_path: results/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_metrics.txt
-  metrics_json_path: results/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_metrics.json
+  predictions_path: results/inference_runs/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_predictions.jsonl
+  metrics_path: results/inference_runs/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_metrics.txt
+  metrics_json_path: results/inference_runs/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_metrics.json

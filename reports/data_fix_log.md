@@ -2,9 +2,9 @@
 
 ## 输入
 
-- 上一版增强 sidecar：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train_augmentations.jsonl`
-- 主增强规格文件：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations.json`
-- 补充增强规格文件：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations_supplement_augment.json`
+- 上一版增强 sidecar：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/merged_chatml_train_augmentations.jsonl`
+- 主增强规格文件：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/curated_train_augmentations.json`
+- 补充增强规格文件：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/curated_train_augmentations_supplement_augment.json`
 
 说明：当前仓库已统一保留 `r4` 补充规格文件；基础版 `final` 的这 16 条新增样本可视为该文件中的历史子集。
 

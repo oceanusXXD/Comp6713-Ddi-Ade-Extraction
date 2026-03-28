@@ -3,9 +3,9 @@
     "original_train": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train.jsonl",
     "original_validation": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_validation.jsonl",
     "original_test": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_test.jsonl",
-    "current_augmentation_jsonl": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/merged_chatml_train_augmentations.jsonl",
-    "primary_spec": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations.json",
-    "supplement_spec": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations_supplement_augment.json",
+    "current_augmentation_jsonl": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/merged_chatml_train_augmentations.jsonl",
+    "primary_spec": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/curated_train_augmentations.json",
+    "supplement_spec": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/curated_train_augmentations_supplement_augment.json",
     "processed_dir": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final",
     "final_train": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_train.jsonl",
     "final_validation": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_validation.jsonl",
@@ -16,7 +16,7 @@
     "duplicate_spec_entries_removed": 0,
     "duplicate_spec_texts": [],
     "per_source_counts": {
-      "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/curated_train_augmentations_supplement_augment.json": 64
+      "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/augmentations/curated_train_augmentations_supplement_augment.json": 64
     }
   },
   "supplement_delta": {

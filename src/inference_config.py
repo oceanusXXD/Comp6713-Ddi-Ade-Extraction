@@ -53,9 +53,9 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
         "disable_log_stats": True,
     },
     "output": {
-        "predictions_path": "results/qwen3_8b_dev_predictions.jsonl",
-        "metrics_path": "results/qwen3_8b_dev_metrics.txt",
-        "metrics_json_path": "results/qwen3_8b_dev_metrics.json",
+        "predictions_path": "results/inference_runs/qwen3_8b_dev_predictions.jsonl",
+        "metrics_path": "results/inference_runs/qwen3_8b_dev_metrics.txt",
+        "metrics_json_path": "results/inference_runs/qwen3_8b_dev_metrics.json",
     },
 }
 

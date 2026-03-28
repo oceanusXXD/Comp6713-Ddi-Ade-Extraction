@@ -49,7 +49,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--primary-augmentations",
         type=str,
-        default="data/curated_train_augmentations.json",
+        default="data/augmentations/curated_train_augmentations.json",
         help="Primary curated augmentation spec JSON path.",
     )
     parser.add_argument(
@@ -57,14 +57,14 @@ def parse_args() -> argparse.Namespace:
         type=str,
         nargs="*",
         default=[
-            "data/curated_train_augmentations_supplement_augment.json",
+            "data/augmentations/curated_train_augmentations_supplement_augment.json",
         ],
         help="Supplemental curated augmentation spec JSON paths.",
     )
     parser.add_argument(
         "--current-augmentation-jsonl",
         type=str,
-        default="data/merged_chatml_train_augmentations.jsonl",
+        default="data/augmentations/merged_chatml_train_augmentations.jsonl",
         help="Current augmentation sidecar used for delta accounting.",
     )
     parser.add_argument(

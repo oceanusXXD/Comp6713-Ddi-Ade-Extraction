@@ -2,124 +2,105 @@
 
 这个目录保存训练产物、LoRA adapter、checkpoint、可观测性文件和规则基线输出。
 
-## 目录里的主要子目录是干什么的
+## 当前最重要的目录
+
+如果你只关心当前推荐训练产物，优先看：
+
+- `qwen3_8b_lora_ddi_ade_final_aug_e4/`
+
+这个目录对应当前主线训练配置 `configs/qwen3_8b_lora_ddi_ade_final.yaml` 中的 `output_dir`。
+
+目录名可按下面方式理解：
+
+- `qwen3_8b`
+  基座模型族
+- `lora`
+  微调方式
+- `ddi_ade`
+  任务范围
+- `final_aug_e4`
+  数据 / 实验版本标记
+
+## 当前保留的主要子目录
 
 - `baseline/`
-  规则基线的输出目录，包含最佳规则配置、验证集 / 测试集预测和对应指标。
+  规则基线输出。
 - `qwen3_8b_lora/`
-  较早一轮保留的可分享 LoRA adapter 目录，里面有 `final_adapter/` 和 `observability/`。
+  较早一轮保留的可分享 adapter 目录。
 - `qwen3_8b_lora_ddi_ade_c5fc8c06/`
-  一套基于 `c5fc8c06` 数据版本跑出的历史训练产物，含 adapter、checkpoint 和观测文件。
+  基于旧数据版本 `c5fc8c06` 的历史训练产物。
 - `qwen3_8b_lora_ddi_ade_final/`
   一轮较早 `final` 版本训练留下的输出目录。
 - `qwen3_8b_lora_ddi_ade_final_aug_e4/`
-  当前主线训练输出目录，现阶段主要保存 checkpoint、`final_adapter/` 和 `observability/`。
+  当前主线训练输出目录。
 - `r4_lora_variant_baseline_results.txt`
-  已清理的 r4 系列 LoRA 变体实验摘要，只保留可追溯的基础结果，不保留原始目录。
+  已清理历史 r4 变体目录后保留下来的摘要结果。
 
-## 已清理的历史实验
+## `qwen3_8b_lora_ddi_ade_final_aug_e4/` 怎么看
 
-以下 r4 变体目录已经从仓库中删除，仅保留摘要文件 `r4_lora_variant_baseline_results.txt`：
-
-- `qwen3_8b_lora_ddi_ade_r4/`
-- `qwen3_8b_lora_ddi_ade_r4_dora/`
-- `qwen3_8b_lora_ddi_ade_r4_lorafa/`
-- `qwen3_8b_lora_ddi_ade_r4_loraplus/`
-- `qwen3_8b_lora_ddi_ade_r4_pissa16/`
-- `qwen3_8b_lora_ddi_ade_r4_rslora/`
-
-## 一个典型训练输出目录里会有什么
-
-以 LoRA 训练目录为例，常见文件包括：
-
-- `adapter_model.safetensors`
-  LoRA 权重本体。
-- `adapter_config.json`
-  LoRA 配置。
-- `tokenizer.json`、`tokenizer_config.json`、`special_tokens_map.json`
-  tokenizer 配置相关文件。
-- `chat_template.jinja`
-  chat template。
-- `added_tokens.json`
-  额外 token 定义。
-- `merges.txt`、`vocab.json`
-  tokenizer 词表相关文件。
-- `final_adapter/`
-  最终可直接加载的 adapter 目录。
-- `checkpoint-*`
-  训练中间 checkpoint。
-- `observability/`
-  运行环境、配置快照、数据统计、训练日志等观测文件。
-
-## `observability/` 里的文件一般怎么理解
-
-常见文件包括：
-
-- `runtime_environment.json`
-  运行环境和依赖信息快照。
-- `training_config_snapshot.json`
-  训练配置快照。
-- `train_dataset_stats.json`
-  训练集统计。
-- `validation_dataset_stats.json`
-  验证集统计。
-- `parameter_stats.json`
-  参数统计。
-- `training_metrics.jsonl`
-  训练过程指标日志。
-- `overfit_watch.log`
-  过拟合观察日志。
-
-## 当前应该重点看哪个目录
-
-如果你要看当前主线训练，优先看：
-
-- `qwen3_8b_lora_ddi_ade_final_aug_e4/`
-
-这个目录目前已经整理成可直接引用的主线训练产物，重点包括：
+这个目录里重点关注：
 
 - `checkpoint-620/`
-  当前训练过程中验证损失最好的保留 checkpoint。
+  2026-03-27 benchmark 中 DDI 迁移表现最强的 rsLoRA checkpoint。
 - `checkpoint-1085/`
-  训练后段保留的中间 checkpoint。
+  训练后段保留的中间 checkpoint，主要用于回看训练过程。
 - `checkpoint-1232/`
   本轮训练完成时的最终 checkpoint。
 - `final_adapter/`
-  训练跑完后导出的最终 adapter。
+  训练完成后导出的最终可加载 adapter。
 - `observability/`
-  训练配置、训练日志、数据统计和环境快照。
+  配置快照、参数统计、训练日志和环境信息。
 
-如果你是从今天的 benchmark 结果倒查模型来源，也建议优先对应：
+## 与 2026-03-27 benchmark 的关系
 
-- `results/benchmark_suite_vllm_batch64_20260327/`
+如果你是从 `results/benchmark_suite_vllm_batch64_20260327/` 倒查模型来源：
 
-其中 `rslora_620` 和 `rslora_1232` 可以直接和这里的现存 checkpoint 对上；`rslora_930` 是今天保留下来的历史评测结果快照，但当前 `outputs/` 下不再单独保留 `checkpoint-930/` 目录。
+- `rslora_620`
+  对应这里的 `checkpoint-620/`
+- `rslora_1232`
+  对应这里的 `checkpoint-1232/`
+- `rslora_930`
+  只保留了 benchmark 结果快照，没有在 `outputs/` 下继续单独保留 `checkpoint-930/`
 
-如果你要看一个已保留的、可以直接分享的 adapter 示例，优先看：
+## 典型训练输出目录的内容
 
-- `qwen3_8b_lora/final_adapter/`
+LoRA 训练目录通常包含：
 
-它的详细文件说明见：
+- `final_adapter/`
+- `checkpoint-*`
+- `observability/`
+- `adapter_model.safetensors`
+- `adapter_config.json`
+- `tokenizer.json`
+- `tokenizer_config.json`
+- `special_tokens_map.json`
+- `chat_template.jinja`
+- `added_tokens.json`
+- `merges.txt`
+- `vocab.json`
 
-- `qwen3_8b_lora/final_adapter/README.md`
+## `observability/` 常见文件
 
-## 规则基线输出文件说明
+- `runtime_environment.json`
+- `training_config_snapshot.json`
+- `train_dataset_stats.json`
+- `validation_dataset_stats.json`
+- `parameter_stats.json`
+- `training_metrics.jsonl`
+- `overfit_watch.log`
 
-`baseline/` 下当前已有：
+## 规则基线输出
+
+`baseline/` 下主要保留：
 
 - `best_config.json`
-  验证集上挑出的最佳规则参数。
 - `baseline_validation_preds.jsonl`
-  基线在验证集上的预测。
 - `baseline_validation_preds_metrics.txt`
-  验证集指标。
 - `baseline_test_preds.jsonl`
-  基线在测试集上的预测。
 - `baseline_test_preds_metrics.txt`
-  测试集指标。
 
 ## 注意事项
 
-- 这里的很多目录是历史实验产物，不一定代表当前推荐版本。
-- 判断“当前主线”要以 `configs/` 下最新配置引用的 `output_dir` 为准。
+- 这里有较多历史实验产物，不能只凭目录名判断是否为当前推荐版本。
+- 判断“主线输出目录”时，应以 `configs/` 中当前训练配置引用的 `output_dir` 为准。
 - 大体积权重文件通常通过 Git LFS 跟踪。

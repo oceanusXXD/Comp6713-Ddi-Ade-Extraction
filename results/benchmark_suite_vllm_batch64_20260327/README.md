@@ -20,27 +20,33 @@
 - `rslora_930`
   历史 rsLoRA `checkpoint-930` 的结果快照。
 - `rslora_1232`
-  当前 rsLoRA 主线训练完成后的 `checkpoint-1232` 结果。
+  当前 rsLoRA 主线在 `checkpoint-1232` 的结果。
 
-## 目录怎么读
+## 建议先看什么
 
 - `summary.csv`
-  全部数据集、全部模型变体的汇总表，是做论文表格、可视化和横向比较的首选入口。
+  全部数据集、全部模型变体的汇总表。
 - `benchmark_analysis_zh.txt`
-  中文结论版分析，已经整理出主任务、外部泛化和 guardrail 三方面的判断。
+  中文分析摘要。
 - `<variant>/`
-  每个变体单独一个目录，里面按数据集保留：
-  - `*_predictions.jsonl`
-  - `*_metrics.json`
-  - `*_metrics.txt`
+  每个变体按数据集保留的 `predictions` 与 `metrics`。
 
-## 当前建议
+## 读表时可先记住的结论
 
-- 如果只追求 ADE 主任务最好结果，优先看 `rslora_1232`。
-- 如果要一个更均衡的默认版本，优先看 `rslora_930`。
-- 如果重点观察 DDI 泛化，优先看 `rslora_620`。
+- in-domain 主任务：
+  `rslora_930` 在 `rslora_own_test` 上的 F1 为 `0.6784`，是这轮保留结果中最强。
+- ADE 迁移：
+  `rslora_1232` 在 `ade_corpus_v2` 上的 F1 为 `0.9135`，优于 `rslora_930` 和 `rslora_620`。
+- DDI 迁移：
+  `rslora_620` 在 `ddi2013_test` 上的 F1 为 `0.4567`，优于 `rslora_930` 和 `rslora_1232`。
+
+## 如何使用这些结论
+
+- 如果优先追求主任务 in-domain 表现：先看 `rslora_930`
+- 如果更看重 ADE 迁移：先看 `rslora_1232`
+- 如果重点观察 DDI 迁移：先看 `rslora_620`
 
 ## 备注
 
-- 这个目录是今天测试内容的主归档入口。
-- 顶层 `results/` 下零散的 `test_metrics_vllm_batch64_*.txt` 仍然保留，但它们主要用于单组设置对比，不替代这里的全量 benchmark。
+- 这组目录是 2026-03-27 benchmark 的主归档入口。
+- 单测试集设置对比文本指标现在统一收在 `results/metrics/test_set_sweeps/`，它们主要用于单组设置对比，不替代这里的全量 benchmark。
