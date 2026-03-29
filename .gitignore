@@ -1,14 +1,14 @@
-# Python
+# Python 缓存
 __pycache__/
 *.py[cod]
 *.so
 
-# Virtual environments and local bootstrap
+# 虚拟环境与本地引导目录
 .venv/
 env/
 venv/
 
-# Tool caches and reports
+# 工具缓存与覆盖率产物
 htmlcov/
 .coverage
 .pytest_cache/
@@ -16,47 +16,19 @@ htmlcov/
 .ruff_cache/
 .ipynb_checkpoints/
 
-# Logs
+# 日志与编辑器临时文件
 *.log
 *.swp
 .DS_Store
 
-# Local model downloads: keep local, do not upload
+# 本地模型下载，不上传
 models/
 
-# Generated inference and evaluation artifacts
-results/*
-!results/README.md
-!results/benchmark_suite_vllm_batch64_20260327/
-results/benchmark_suite_vllm_batch64_20260327/*
-!results/benchmark_suite_vllm_batch64_20260327/README.md
-!results/benchmark_suite_vllm_batch64_20260327/benchmark_analysis_zh.txt
-!results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/
-results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/*
-!results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/**
-!results/benchmark_suite_latest_raw_clean_base_20260329/
-results/benchmark_suite_latest_raw_clean_base_20260329/*
-!results/benchmark_suite_latest_raw_clean_base_20260329/**
-!results/metrics/
-results/metrics/*
-!results/metrics/README.md
-!results/metrics/model_snapshots/
-results/metrics/model_snapshots/*
-!results/metrics/model_snapshots/*.txt
-!results/metrics/augmentations/
-results/metrics/augmentations/*
-!results/metrics/augmentations/*.txt
-!results/metrics/test_set_sweeps/
-results/metrics/test_set_sweeps/*
-!results/metrics/test_set_sweeps/*.txt
-!results/inference_runs/
-results/inference_runs/*
-!results/inference_runs/README.md
-!results/prevalidation/
-results/prevalidation/*
-!results/prevalidation/README.md
+# 推理与评测结果产物
 
-# Local evaluation bundles
+
+
+# 本地评测数据镜像
 evaluate_datasets/**
 !evaluate_datasets/**/
 !evaluate_datasets/**/README*.md
@@ -64,30 +36,16 @@ evaluate_datasets/**
 !evaluate_datasets/**/*.py
 !evaluate_datasets/**/*.sh
 
-# Training outputs: keep the final LoRA adapter only
+# 训练输出默认不上传；baseline 文本结果可保留，超大 adapter 仅本地保存
 outputs/*
 !outputs/README.md
 !outputs/r4_lora_variant_baseline_results.txt
-!outputs/qwen3_8b_lora/
-outputs/qwen3_8b_lora/*
-!outputs/qwen3_8b_lora/final_adapter/
-!outputs/qwen3_8b_lora/final_adapter/**
-!outputs/qwen3_8b_lora_ddi_ade_c5fc8c06/
-outputs/qwen3_8b_lora_ddi_ade_c5fc8c06/*
-!outputs/qwen3_8b_lora_ddi_ade_c5fc8c06/README.md
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/
-outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/*
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/README.md
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-620/
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1085/
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1232/
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/final_adapter/
-outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-620/*
-outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1085/*
-outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1232/*
-outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/final_adapter/*
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-620/README.md
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1085/README.md
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/checkpoint-1232/README.md
-!outputs/qwen3_8b_lora_ddi_ade_final_aug_e4/final_adapter/README.md
-!results/benchmark_suite_vllm_batch64_20260327/summary.csv
+!outputs/baseline/
+outputs/baseline/*
+!outputs/baseline/**
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/
+outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/*
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/README.md
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/
+outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/*
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/**
