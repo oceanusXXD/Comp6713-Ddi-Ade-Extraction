@@ -33,24 +33,24 @@ TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9+./-]*")
 
 def parse_args() -> argparse.Namespace:
     """解析命令行参数。"""
-    parser = argparse.ArgumentParser(description="Audit ADE/DDI data, build final dataset, and write reports.")
+    parser = argparse.ArgumentParser(description="审计 ADE/DDI 数据、物化最终数据集并写出报告。")
     parser.add_argument(
         "--config",
         type=str,
         default="configs/qwen3_8b_lora_ddi_ade_final.yaml",
-        help="Training config used for tokenizer-backed length statistics.",
+        help="用于 tokenizer 长度统计的训练配置文件。",
     )
     parser.add_argument(
         "--base-data-dir",
         type=str,
         default="data",
-        help="Directory containing the original merged_chatml_{train,validation,test}.jsonl files.",
+        help="包含原始 merged_chatml_{train,validation,test}.jsonl 文件的目录。",
     )
     parser.add_argument(
         "--primary-augmentations",
         type=str,
         default="data/augmentations/curated_train_augmentations.json",
-        help="Primary curated augmentation spec JSON path.",
+        help="主增强规格 JSON 文件路径。",
     )
     parser.add_argument(
         "--supplement-augmentations",
@@ -59,25 +59,25 @@ def parse_args() -> argparse.Namespace:
         default=[
             "data/augmentations/curated_train_augmentations_supplement_augment.json",
         ],
-        help="Supplemental curated augmentation spec JSON paths.",
+        help="补充增强规格 JSON 文件路径列表。",
     )
     parser.add_argument(
         "--current-augmentation-jsonl",
         type=str,
         default="data/augmentations/merged_chatml_train_augmentations.jsonl",
-        help="Current augmentation sidecar used for delta accounting.",
+        help="当前增强 sidecar JSONL，用于统计增量变化。",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
         default="data/processed/Comp6713-Ddi-Ade-Extraction_final_augment",
-        help="Directory where the final train/validation/test files will be written.",
+        help="最终 train/validation/test 文件的输出目录。",
     )
     parser.add_argument(
         "--report-dir",
         type=str,
         default="reports/augment",
-        help="Directory where audit/fix/stats reports will be written.",
+        help="审计、修复和统计报告的输出目录。",
     )
     return parser.parse_args()
 
@@ -88,12 +88,12 @@ def normalize_text(text: str) -> str:
 
 
 def canonical_text(text: str) -> str:
-    """把文本折叠成便于去重和比对的 canonical 形式。"""
+    """把文本折叠成便于去重和比对的规范形式。"""
     return normalize_text(text).casefold()
 
 
 def tokenize_text(text: str) -> set[str]:
-    """把文本切成简单 token 集，用于近重复分析。"""
+    """把文本切成简单词元集合，用于近重复分析。"""
     return {match.group(0).casefold() for match in TOKEN_RE.finditer(text)}
 
 
@@ -103,7 +103,7 @@ def read_json(path: Path) -> Any:
 
 
 def sha256_text(value: str) -> str:
-    """计算文本 SHA-256。"""
+    """计算文本的 SHA-256。"""
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 

@@ -20,30 +20,30 @@ from src.prompting import load_system_prompt
 
 def parse_args() -> argparse.Namespace:
     """解析命令行参数。"""
-    parser = argparse.ArgumentParser(description="Analyze ADE/DDI ChatML dataset statistics.")
+    parser = argparse.ArgumentParser(description="统计 ADE/DDI ChatML 数据集信息。")
     parser.add_argument(
         "--config",
         type=str,
         default="configs/qwen3_8b_lora_ddi_ade_final.yaml",
-        help="Training config used to resolve tokenizer and max_seq_length.",
+        help="用于解析 tokenizer 与 max_seq_length 的训练配置文件。",
     )
     parser.add_argument(
         "--input-path",
         type=str,
         required=True,
-        help="Dataset JSONL path to analyze.",
+        help="待统计的数据集 JSONL 路径。",
     )
     parser.add_argument(
         "--output-path",
         type=str,
         required=True,
-        help="Where to save the computed statistics JSON.",
+        help="统计结果 JSON 的输出路径。",
     )
     parser.add_argument(
         "--limit",
         type=int,
         default=None,
-        help="Optional sample cap for faster analysis.",
+        help="可选样本上限，用于加快统计速度。",
     )
     return parser.parse_args()
 
@@ -65,7 +65,7 @@ def main() -> None:
         limit=args.limit,
     )
     write_json(Path(args.output_path).expanduser().resolve(), stats)
-    print(f"Saved dataset statistics to: {Path(args.output_path).expanduser().resolve()}")
+    print(f"数据集统计结果已保存到：{Path(args.output_path).expanduser().resolve()}")
 
 
 if __name__ == "__main__":

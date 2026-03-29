@@ -40,46 +40,93 @@ VARIANT_SPECS: Dict[str, Dict[str, Optional[str]]] = {
     },
 }
 
+DEFAULT_OWN_VALIDATION_PATH = "data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl"
+DEFAULT_OWN_TEST_PATH = "data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_test.jsonl"
+
 METRIC_MODE_LABELED = "labeled_task"
 METRIC_MODE_EMPTY_GUARDRAIL = "empty_guardrail"
 METRIC_MODE_UNLABELED_SCHEMA = "unlabeled_schema"
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run serial vLLM benchmarks across repository splits and evaluate_datasets.")
+    parser = argparse.ArgumentParser(description="串行运行整套 vLLM benchmark。")
     parser.add_argument(
         "--variants",
         nargs="+",
         default=["base", "lora", "rslora_620", "rslora_930"],
-        help="Variant ids to run. Choices: base, lora, rslora_620, rslora_930",
+        help="要运行的预置变体 id。",
     )
     parser.add_argument(
         "--results-dir",
         type=str,
         default="results/benchmark_suite_vllm_batch64",
-        help="Output directory for predictions, metrics, and summary CSV.",
+        help="预测结果、指标和汇总 CSV 的输出目录。",
     )
-    parser.add_argument("--batch-size", type=int, default=64, help="Inference batch size.")
-    parser.add_argument("--max-new-tokens", type=int, default=512, help="Generation max tokens.")
+    parser.add_argument("--batch-size", type=int, default=64, help="推理 batch size。")
+    parser.add_argument("--max-new-tokens", type=int, default=512, help="生成最大 token 数。")
     parser.add_argument(
         "--only-datasets",
         nargs="*",
         default=None,
-        help="Optional dataset name allowlist.",
+        help="可选的数据集白名单。",
     )
     parser.add_argument(
         "--skip-datasets",
         nargs="*",
         default=None,
-        help="Optional dataset name denylist.",
+        help="可选的数据集黑名单。",
     )
     parser.add_argument(
         "--limit-per-dataset",
         type=int,
         default=None,
-        help="Optional cap for each dataset builder, useful for smoke runs.",
+        help="每个数据集的可选样本上限，适合 smoke run。",
+    )
+    parser.add_argument(
+        "--adapter-path",
+        type=str,
+        default=None,
+        help="单独指定一个 adapter 路径；设置后忽略 --variants，只跑这一项。",
+    )
+    parser.add_argument(
+        "--variant-name",
+        type=str,
+        default="custom",
+        help="配合 --adapter-path 使用的变体名。",
+    )
+    parser.add_argument(
+        "--variant-label",
+        type=str,
+        default=None,
+        help="配合 --adapter-path 使用的人类可读标签。",
+    )
+    parser.add_argument(
+        "--base-model-path",
+        type=str,
+        default=None,
+        help="覆盖基座模型路径；默认使用 ../models/Qwen3-8B。",
+    )
+    parser.add_argument(
+        "--own-validation-path",
+        type=str,
+        default=DEFAULT_OWN_VALIDATION_PATH,
+        help="仓库自带验证集路径，默认指向 latest_raw_clean 版本。",
+    )
+    parser.add_argument(
+        "--own-test-path",
+        type=str,
+        default=DEFAULT_OWN_TEST_PATH,
+        help="仓库自带测试集路径，默认指向 latest_raw_clean 版本。",
     )
     return parser.parse_args()
+
+
+def resolve_project_or_absolute_path(raw_path: str | Path) -> Path:
+    """把命令行里给的路径解析成绝对路径。"""
+    candidate = Path(raw_path).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (PROJECT_ROOT / candidate).resolve()
 
 
 def normalize_text(value: str) -> str:
@@ -678,46 +725,32 @@ def summarize_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def dataset_specs(system_prompt: str, limit: Optional[int]) -> List[Dict[str, Any]]:
+def dataset_specs(
+    system_prompt: str,
+    limit: Optional[int],
+    *,
+    own_validation_path: Path,
+    own_test_path: Path,
+) -> List[Dict[str, Any]]:
     eval_root = PROJECT_ROOT / "evaluate_datasets"
     return [
         {
-            "name": "lora_own_validation",
+            "name": "own_validation",
             "group": "own_splits",
             "metric_mode": METRIC_MODE_LABELED,
             "builder": lambda: build_chatml_dataset(
-                PROJECT_ROOT / "data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_validation.jsonl",
-                split="lora_val",
+                own_validation_path,
+                split="own_validation",
                 limit=limit,
             ),
         },
         {
-            "name": "lora_own_test",
+            "name": "own_test",
             "group": "own_splits",
             "metric_mode": METRIC_MODE_LABELED,
             "builder": lambda: build_chatml_dataset(
-                PROJECT_ROOT / "data/processed/Comp6713-Ddi-Ade-Extraction_final/merged_chatml_test.jsonl",
-                split="lora_test",
-                limit=limit,
-            ),
-        },
-        {
-            "name": "rslora_own_validation",
-            "group": "own_splits",
-            "metric_mode": METRIC_MODE_LABELED,
-            "builder": lambda: build_chatml_dataset(
-                PROJECT_ROOT / "data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_validation.jsonl",
-                split="rslora_val",
-                limit=limit,
-            ),
-        },
-        {
-            "name": "rslora_own_test",
-            "group": "own_splits",
-            "metric_mode": METRIC_MODE_LABELED,
-            "builder": lambda: build_chatml_dataset(
-                PROJECT_ROOT / "data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_test.jsonl",
-                split="rslora_test",
+                own_test_path,
+                split="own_test",
                 limit=limit,
             ),
         },
@@ -932,31 +965,59 @@ def dataset_specs(system_prompt: str, limit: Optional[int]) -> List[Dict[str, An
     ]
 
 
-def build_variant_config(variant: str, *, batch_size: int, max_new_tokens: int) -> Dict[str, Any]:
-    if variant not in VARIANT_SPECS:
-        raise ValueError(f"Unsupported variant: {variant}")
+def build_variant_config(
+    *,
+    adapter_path: Optional[Path],
+    batch_size: int,
+    max_new_tokens: int,
+    base_model_path: Optional[Path] = None,
+) -> Dict[str, Any]:
     config = load_inference_config("configs/infer_qwen3_8b_lora_ddi_ade_final.yaml", validate=False)
     config["backend"] = "vllm"
-    config["model"]["base_model_name_or_path"] = PROJECT_ROOT.parent / "models" / "Qwen3-8B"
-    adapter_path = VARIANT_SPECS[variant]["adapter_path"]
-    config["model"]["adapter_path"] = (PROJECT_ROOT / adapter_path) if adapter_path is not None else None
+    config["model"]["base_model_name_or_path"] = (
+        base_model_path if base_model_path is not None else PROJECT_ROOT.parent / "models" / "Qwen3-8B"
+    )
+    config["model"]["adapter_path"] = adapter_path
     config["inference"]["batch_size"] = batch_size
     config["inference"]["max_new_tokens"] = max_new_tokens
     config["output"] = {}
     return config
 
 
-def ensure_variant_paths(variants: Sequence[str]) -> None:
-    for variant in variants:
+def resolve_variant_entries(args: argparse.Namespace) -> List[Dict[str, Any]]:
+    """把预置变体或自定义 adapter 整理成统一的运行条目。"""
+    if args.adapter_path is not None:
+        return [
+            {
+                "name": str(args.variant_name or "custom"),
+                "label": str(args.variant_label or args.variant_name or "custom"),
+                "adapter_path": resolve_project_or_absolute_path(args.adapter_path),
+            }
+        ]
+
+    entries: List[Dict[str, Any]] = []
+    for variant in args.variants:
         spec = VARIANT_SPECS.get(variant)
         if spec is None:
             raise ValueError(f"Unknown variant: {variant}")
         adapter_path = spec["adapter_path"]
+        entries.append(
+            {
+                "name": variant,
+                "label": spec["label"],
+                "adapter_path": (PROJECT_ROOT / adapter_path).resolve() if adapter_path is not None else None,
+            }
+        )
+    return entries
+
+
+def ensure_variant_paths(variant_entries: Sequence[Dict[str, Any]]) -> None:
+    for variant in variant_entries:
+        adapter_path = variant["adapter_path"]
         if adapter_path is None:
             continue
-        resolved = PROJECT_ROOT / adapter_path
-        if not resolved.exists():
-            raise FileNotFoundError(f"Adapter not found for variant {variant}: {resolved}")
+        if not Path(adapter_path).exists():
+            raise FileNotFoundError(f"Adapter not found for variant {variant['name']}: {adapter_path}")
 
 
 def should_include_dataset(name: str, *, only: Optional[Sequence[str]], skip: Optional[Sequence[str]]) -> bool:
@@ -969,12 +1030,20 @@ def should_include_dataset(name: str, *, only: Optional[Sequence[str]], skip: Op
 
 def main() -> None:
     args = parse_args()
-    ensure_variant_paths(args.variants)
+    variant_entries = resolve_variant_entries(args)
+    ensure_variant_paths(variant_entries)
 
     system_prompt = load_system_prompt(str(PROJECT_ROOT / "prompts" / "medical_relation_extraction_system_prompt.txt"))
+    own_validation_path = resolve_project_or_absolute_path(args.own_validation_path)
+    own_test_path = resolve_project_or_absolute_path(args.own_test_path)
     specs = [
         spec
-        for spec in dataset_specs(system_prompt=system_prompt, limit=args.limit_per_dataset)
+        for spec in dataset_specs(
+            system_prompt=system_prompt,
+            limit=args.limit_per_dataset,
+            own_validation_path=own_validation_path,
+            own_test_path=own_test_path,
+        )
         if should_include_dataset(spec["name"], only=args.only_datasets, skip=args.skip_datasets)
     ]
     if not specs:
@@ -983,23 +1052,29 @@ def main() -> None:
     results_root = PROJECT_ROOT / args.results_dir
     results_root.mkdir(parents=True, exist_ok=True)
     summary_path = results_root / "summary.csv"
+    base_model_path = resolve_project_or_absolute_path(args.base_model_path) if args.base_model_path else None
 
-    for variant in args.variants:
-        variant_dir = results_root / variant
+    for variant in variant_entries:
+        variant_dir = results_root / variant["name"]
         variant_dir.mkdir(parents=True, exist_ok=True)
-        config = build_variant_config(variant, batch_size=args.batch_size, max_new_tokens=args.max_new_tokens)
+        config = build_variant_config(
+            adapter_path=variant["adapter_path"],
+            batch_size=args.batch_size,
+            max_new_tokens=args.max_new_tokens,
+            base_model_path=base_model_path,
+        )
 
-        print(f"[{variant}] building datasets...")
+        print(f"[{variant['name']}] building datasets...")
         built_specs: List[Tuple[Dict[str, Any], List[DatasetExample]]] = []
         for spec in specs:
             examples = spec["builder"]()
             built_specs.append((spec, examples))
             print(
-                f"[{variant}] dataset {spec['name']} ({spec['metric_mode']}): {len(examples)} samples",
+                f"[{variant['name']}] dataset {spec['name']} ({spec['metric_mode']}): {len(examples)} samples",
                 flush=True,
             )
 
-        print(f"[{variant}] loading model with vLLM...", flush=True)
+        print(f"[{variant['name']}] loading model with vLLM...", flush=True)
         llm, tokenizer, sampling_params_class, lora_request_class = load_model_and_tokenizer_vllm(config)
 
         summary_rows: List[Dict[str, Any]] = []
@@ -1007,15 +1082,15 @@ def main() -> None:
             for spec, examples in built_specs:
                 dataset_name = spec["name"]
                 metric_mode = spec["metric_mode"]
-                print(f"[{variant}] running {dataset_name} ({len(examples)} samples)...", flush=True)
+                print(f"[{variant['name']}] running {dataset_name} ({len(examples)} samples)...", flush=True)
                 rows = generate_predictions((llm, sampling_params_class, lora_request_class), tokenizer, examples, config)
 
                 pred_path = variant_dir / f"{dataset_name}_predictions.jsonl"
                 write_prediction_rows(pred_path, rows)
 
                 base_summary = {
-                    "variant": variant,
-                    "variant_label": VARIANT_SPECS[variant]["label"],
+                    "variant": variant["name"],
+                    "variant_label": variant["label"],
                     "dataset_group": spec["group"],
                     "dataset": dataset_name,
                     "metric_mode": metric_mode,
@@ -1037,7 +1112,7 @@ def main() -> None:
                         "fn": "",
                     }
                     print(
-                        f"[{variant}] done {dataset_name}: parse={metrics['parse_success_rate']:.4f} "
+                        f"[{variant['name']}] done {dataset_name}: parse={metrics['parse_success_rate']:.4f} "
                         f"nonempty={metrics['predicted_nonempty_rate']:.4f}",
                         flush=True,
                     )
@@ -1067,7 +1142,7 @@ def main() -> None:
                         "fn": metrics["micro"]["fn"],
                     }
                     print(
-                        f"[{variant}] done {dataset_name}: "
+                        f"[{variant['name']}] done {dataset_name}: "
                         f"P={metrics['micro']['precision']:.4f} "
                         f"R={metrics['micro']['recall']:.4f} "
                         f"F1={metrics['micro']['f1']:.4f} "
@@ -1090,7 +1165,7 @@ def main() -> None:
             if mode == "w":
                 writer.writeheader()
             writer.writerows(summary_rows)
-        print(f"[{variant}] summary written to {summary_path}", flush=True)
+        print(f"[{variant['name']}] summary written to {summary_path}", flush=True)
 
 
 if __name__ == "__main__":

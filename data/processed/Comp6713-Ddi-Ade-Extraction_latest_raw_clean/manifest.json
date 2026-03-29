@@ -1,0 +1,47 @@
+{
+  "dataset_version": "Comp6713-Ddi-Ade-Extraction_latest_raw_clean",
+  "train_path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl",
+  "validation_path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl",
+  "test_path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_test.jsonl",
+  "dataset_hash": "d03c7933eabf",
+  "notes": [
+    "数据源以最新拉取的顶层 raw train/validation/test 文件为准",
+    "已从 train 中移除与 validation 的精确文本重叠",
+    "已去除每条样本内部完全重复的关系三元组",
+    "已移除 head 或 tail 在原文中大小写不敏感匹配不到的关系",
+    "若样本在清理后变为空标签则删除该样本",
+    "已从 train 中移除与 test 的精确文本重叠",
+    "已从 validation 中移除与 test 的精确文本重叠",
+    "已将每个 split 内的完全重复文本压缩为一行",
+    "当重复文本的标签集合不一致时，保留多数关系集合",
+    "已将 assistant 目标重写为规范序列化关系格式",
+    "已移除 head==tail 的自环关系",
+    "已将同一实体对的多标签冲突收敛为单标签",
+    "冲突消解使用 DDI 优先级：DDI-ADVISE > DDI-MECHANISM > DDI-EFFECT > DDI-INT",
+    "若一行在自环与冲突清理后变为空标签，则删除该行"
+  ],
+  "dedup_stage": {
+    "train_cross_split_removed": 2,
+    "validation_cross_split_removed": 0,
+    "train_duplicate_rows_removed": 4,
+    "validation_duplicate_rows_removed": 1,
+    "test_duplicate_rows_removed": 0
+  },
+  "sanitize_stage": {
+    "train": {
+      "self_loop_relations_removed": 23,
+      "same_pair_conflicts_resolved": 494,
+      "rows_dropped_empty_after_cleanup": 0
+    },
+    "validation": {
+      "self_loop_relations_removed": 1,
+      "same_pair_conflicts_resolved": 67,
+      "rows_dropped_empty_after_cleanup": 0
+    },
+    "test": {
+      "self_loop_relations_removed": 0,
+      "same_pair_conflicts_resolved": 27,
+      "rows_dropped_empty_after_cleanup": 0
+    }
+  }
+}
