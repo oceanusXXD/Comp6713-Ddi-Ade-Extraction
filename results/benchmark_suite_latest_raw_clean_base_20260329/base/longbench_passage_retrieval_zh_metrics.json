@@ -1,0 +1,68 @@
+{
+  "total_samples": 50,
+  "parsed_samples": 50,
+  "parse_success_rate": 1.0,
+  "parse_failure_counts": {},
+  "exact_match_count": 49,
+  "exact_match_accuracy": 0.98,
+  "micro": {
+    "tp": 0,
+    "fp": 4,
+    "fn": 0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "per_label": {
+    "ADE": {
+      "tp": 0,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "gold_count": 0,
+      "pred_count": 4
+    },
+    "DDI-MECHANISM": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "gold_count": 0,
+      "pred_count": 0
+    },
+    "DDI-EFFECT": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "gold_count": 0,
+      "pred_count": 0
+    },
+    "DDI-ADVISE": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "gold_count": 0,
+      "pred_count": 0
+    },
+    "DDI-INT": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "gold_count": 0,
+      "pred_count": 0
+    }
+  }
+}

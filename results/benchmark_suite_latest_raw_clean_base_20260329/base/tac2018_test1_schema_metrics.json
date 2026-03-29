@@ -1,0 +1,7 @@
+{
+  "total_samples": 487,
+  "parsed_samples": 487,
+  "parse_success_rate": 1.0,
+  "predicted_nonempty_rate": 0.7330595482546202,
+  "mean_predicted_relations": 3.5256673511293632
+}

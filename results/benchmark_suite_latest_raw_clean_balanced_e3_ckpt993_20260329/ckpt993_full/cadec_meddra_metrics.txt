@@ -1,0 +1,17 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/ckpt993_full/cadec_meddra_predictions.jsonl
+Total samples: 1250
+Parsed successfully: 1250/1250 = 100.00%
+Exact match accuracy: 38/1250 = 3.04%
+TP=1092, FP=2797, FN=4898
+Precision: 0.2808
+Recall:    0.1823
+F1:        0.2211
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=1092 FP=2681 FN=4898 P=0.2894 R=0.1823 F1=0.2237
+DDI-MECHANISM: TP=0 FP=2 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-EFFECT: TP=0 FP=62 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-ADVISE: TP=0 FP=52 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-INT: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+================================================================================

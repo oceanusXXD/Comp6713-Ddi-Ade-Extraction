@@ -1,0 +1,17 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/ckpt993_full/seen_style_validation_predictions.jsonl
+Total samples: 589
+Parsed successfully: 589/589 = 100.00%
+Exact match accuracy: 388/589 = 65.87%
+TP=1259, FP=372, FN=774
+Precision: 0.7719
+Recall:    0.6193
+F1:        0.6872
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=460 FP=104 FN=119 P=0.8156 R=0.7945 F1=0.8049
+DDI-MECHANISM: TP=236 FP=111 FN=278 P=0.6801 R=0.4591 F1=0.5482
+DDI-EFFECT: TP=333 FP=96 FN=255 P=0.7762 R=0.5663 F1=0.6549
+DDI-ADVISE: TP=195 FP=53 FN=102 P=0.7863 R=0.6566 F1=0.7156
+DDI-INT: TP=35 FP=8 FN=20 P=0.8140 R=0.6364 F1=0.7143
+================================================================================

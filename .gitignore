@@ -31,6 +31,12 @@ results/*
 results/benchmark_suite_vllm_batch64_20260327/*
 !results/benchmark_suite_vllm_batch64_20260327/README.md
 !results/benchmark_suite_vllm_batch64_20260327/benchmark_analysis_zh.txt
+!results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/
+results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/*
+!results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/**
+!results/benchmark_suite_latest_raw_clean_base_20260329/
+results/benchmark_suite_latest_raw_clean_base_20260329/*
+!results/benchmark_suite_latest_raw_clean_base_20260329/**
 !results/metrics/
 results/metrics/*
 !results/metrics/README.md

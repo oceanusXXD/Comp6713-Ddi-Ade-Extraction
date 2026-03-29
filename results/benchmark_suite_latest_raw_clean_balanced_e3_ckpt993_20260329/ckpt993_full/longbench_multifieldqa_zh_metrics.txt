@@ -1,0 +1,18 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329/ckpt993_full/longbench_multifieldqa_zh_predictions.jsonl
+Total samples: 48
+Parsed successfully: 47/48 = 97.92%
+Parse failure counts: {'invalid_schema': 1}
+Exact match accuracy: 1/48 = 2.08%
+TP=0, FP=63, FN=0
+Precision: 0.0000
+Recall:    0.0000
+F1:        0.0000
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=0 FP=8 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-MECHANISM: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-EFFECT: TP=0 FP=19 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-ADVISE: TP=0 FP=30 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-INT: TP=0 FP=6 FN=0 P=0.0000 R=0.0000 F1=0.0000
+================================================================================

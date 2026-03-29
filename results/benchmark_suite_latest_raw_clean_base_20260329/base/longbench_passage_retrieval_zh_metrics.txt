@@ -1,0 +1,17 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_base_20260329/base/longbench_passage_retrieval_zh_predictions.jsonl
+Total samples: 50
+Parsed successfully: 50/50 = 100.00%
+Exact match accuracy: 49/50 = 98.00%
+TP=0, FP=4, FN=0
+Precision: 0.0000
+Recall:    0.0000
+F1:        0.0000
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=0 FP=4 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-MECHANISM: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-EFFECT: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-ADVISE: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-INT: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+================================================================================

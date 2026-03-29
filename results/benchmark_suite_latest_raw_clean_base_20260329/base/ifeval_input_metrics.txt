@@ -1,0 +1,18 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_base_20260329/base/ifeval_input_predictions.jsonl
+Total samples: 541
+Parsed successfully: 95/541 = 17.56%
+Parse failure counts: {'invalid_json': 392, 'invalid_schema': 54}
+Exact match accuracy: 534/541 = 98.71%
+TP=0, FP=28, FN=0
+Precision: 0.0000
+Recall:    0.0000
+F1:        0.0000
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=0 FP=15 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-MECHANISM: TP=0 FP=3 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-EFFECT: TP=0 FP=3 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-ADVISE: TP=0 FP=3 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-INT: TP=0 FP=4 FN=0 P=0.0000 R=0.0000 F1=0.0000
+================================================================================

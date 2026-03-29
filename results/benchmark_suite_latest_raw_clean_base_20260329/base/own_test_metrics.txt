@@ -1,0 +1,17 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_base_20260329/base/own_test_predictions.jsonl
+Total samples: 619
+Parsed successfully: 619/619 = 100.00%
+Exact match accuracy: 73/619 = 11.79%
+TP=263, FP=778, FN=1319
+Precision: 0.2526
+Recall:    0.1662
+F1:        0.2005
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=106 FP=155 FN=562 P=0.4061 R=0.1587 F1=0.2282
+DDI-MECHANISM: TP=62 FP=187 FN=211 P=0.2490 R=0.2271 F1=0.2375
+DDI-EFFECT: TP=50 FP=207 FN=282 P=0.1946 R=0.1506 F1=0.1698
+DDI-ADVISE: TP=30 FP=118 FN=186 P=0.2027 R=0.1389 F1=0.1648
+DDI-INT: TP=15 FP=111 FN=78 P=0.1190 R=0.1613 F1=0.1370
+================================================================================

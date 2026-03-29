@@ -1,0 +1,18 @@
+================================================================================
+Prediction file: /home/coder/data/Comp6713-Ddi-Ade-Extraction/results/benchmark_suite_latest_raw_clean_base_20260329/base/longbench_multifieldqa_en_predictions.jsonl
+Total samples: 219
+Parsed successfully: 218/219 = 99.54%
+Parse failure counts: {'invalid_json': 1}
+Exact match accuracy: 217/219 = 99.09%
+TP=0, FP=2, FN=0
+Precision: 0.0000
+Recall:    0.0000
+F1:        0.0000
+--------------------------------------------------------------------------------
+Per-label metrics:
+ADE: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-MECHANISM: TP=0 FP=2 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-EFFECT: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-ADVISE: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+DDI-INT: TP=0 FP=0 FN=0 P=0.0000 R=0.0000 F1=0.0000
+================================================================================
