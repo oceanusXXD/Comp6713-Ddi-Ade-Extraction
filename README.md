@@ -76,7 +76,7 @@
 - `flash_attn/`
   本地兼容层，用来补齐仓库需要的 `apply_rotary` 接口。先看 `flash_attn/README.md`。
 
-### 新接手建议阅读顺序
+### 建议阅读顺序
 
 1. `README.md`
 2. `configs/README.md`
@@ -152,7 +152,6 @@ pip install -r requirements.txt
 
 ## 命名约定
 
-这轮整理后，仓库内的人类可读说明统一采用下面约定：
 
 - 目录说明文件统一命名为 `README.md`
 - 训练配置使用 `configs/<model>_<finetune>_<task>_<tag>.yaml`
