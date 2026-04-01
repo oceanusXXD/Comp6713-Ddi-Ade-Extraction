@@ -32,6 +32,11 @@
 - `fetch_evaluate_datasets.py`
   下载公开评测集、写 `evaluate_datasets/MANIFEST.json`，并构建 `seen_style_core/` 镜像。
 
+### `demo/`
+
+- `gradio_demo.py`
+  Gradio demo (English UI): base-only preset first, optional LoRA presets; see `scripts/demo/README.md`.
+
 ### `experiments/`
 
 - `run_qwen3_lora_variant_benchmark.py`

@@ -120,16 +120,29 @@ def resolve_project_path(value: Optional[str]) -> Optional[Path]:
 def try_resolve_existing_path(value: str) -> Optional[Path]:
     """尽量把用户给的字符串解析成当前机器上真实存在的路径。"""
     raw_path = Path(value).expanduser()
-    candidates = []
+    candidates: list[Path] = []
     if raw_path.is_absolute():
         candidates.append(raw_path)
     else:
         candidates.append((PROJECT_ROOT / raw_path).resolve())
         candidates.append(raw_path.resolve())
+        # 文档约定是「仓库上一级 /models/模型名」，但实际常见把模型放在「仓库根 /models/模型名」
+        candidates.append((PROJECT_ROOT / "models" / raw_path.name).resolve())
+        # 若写的是 models/Qwen3-8B（相对仓库根）
+        if raw_path.parts and raw_path.parts[0] == "models" and len(raw_path.parts) > 1:
+            candidates.append((PROJECT_ROOT.joinpath(*raw_path.parts)).resolve())
 
     for candidate in candidates:
         if candidate.exists():
             return candidate
+    return None
+
+
+def _default_hf_id_if_local_qwen3_missing(normalized: str) -> Optional[str]:
+    """当配置写的是默认本地 Qwen3-8B 布局但磁盘上未找到时，返回官方 HF id 供 allow_remote 兜底。"""
+    lower = normalized.replace("\\", "/").rstrip("/")
+    if lower.endswith("Qwen3-8B") or lower.endswith("models/Qwen3-8B"):
+        return "Qwen/Qwen3-8B"
     return None
 
 
@@ -148,6 +161,9 @@ def resolve_model_source(value: Optional[str], *, allow_remote: bool = False) ->
     if existing_path is not None:
         return str(existing_path)
     if allow_remote:
+        fallback = _default_hf_id_if_local_qwen3_missing(normalized)
+        if fallback is not None:
+            return fallback
         return normalized
     raise FileNotFoundError(
         "Remote model sources are disabled for this repository. "
