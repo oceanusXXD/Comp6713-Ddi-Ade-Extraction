@@ -169,11 +169,6 @@ def main() -> None:
     """推理脚本主流程。"""
     configure_logging()
     args = parse_args()
-    if Path(sys.prefix).resolve() != (PROJECT_ROOT / ".venv").resolve():
-        raise RuntimeError(
-            f"Please run inference with the repository virtualenv python. "
-            f"sys.prefix={Path(sys.prefix).resolve()} expected={(PROJECT_ROOT / '.venv').resolve()}"
-        )
     config = apply_cli_overrides(load_inference_config(args.config, validate=False), args)
     if args.enable_thinking and args.disable_thinking:
         raise ValueError("Use at most one of --enable-thinking or --disable-thinking.")
