@@ -8,6 +8,10 @@
   当前主线训练配置。
 - `infer_qwen3_8b_lora_ddi_ade_final.yaml`
   当前主线推理配置。
+- `infer_gradio_base.yaml`
+  Gradio 交互式 base-only 推理配置。
+- `infer_gradio_balanced_e3.yaml`
+  Gradio 交互式 LoRA 推理配置，adapter 使用仓库相对路径。
 
 ## 两份配置如何配合
 
@@ -50,6 +54,13 @@
 - 默认输出：
   - `results/inference_runs/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_predictions.jsonl`
   - `results/inference_runs/qwen3_8b_lora_ddi_ade_final_aug_e4_validation_metrics.txt`
+
+### Gradio demo 配置
+
+- base：`configs/infer_gradio_base.yaml`
+- LoRA：`configs/infer_gradio_balanced_e3.yaml`
+- demo LoRA adapter：`outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter`
+- 这两份配置服务于交互式 UI，不依赖批量数据集输入路径。
 
 ## 最常改的字段
 

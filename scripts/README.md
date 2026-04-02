@@ -35,7 +35,7 @@
 ### `demo/`
 
 - `gradio_demo.py`
-  Gradio demo (English UI): base-only preset first, optional LoRA presets; see `scripts/demo/README.md`.
+  Gradio demo (English UI): direct text inference, optional examples, and two supported presets: base-only plus the repo-relative LoRA adapter; see `scripts/demo/README.md`.
 
 ### `experiments/`
 

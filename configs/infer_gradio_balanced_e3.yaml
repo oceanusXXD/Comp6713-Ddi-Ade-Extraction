@@ -1,4 +1,4 @@
-# Gradio：仓库内已提交的 balanced_e3 final_adapter，便于开箱体验模型切换。
+# Gradio：仓库内可直接使用的 LoRA adapter，路径保持仓库相对路径，便于跨机器复用。
 seed: 42
 system_prompt_path: prompts/medical_relation_extraction_system_prompt.txt
 backend: transformers
