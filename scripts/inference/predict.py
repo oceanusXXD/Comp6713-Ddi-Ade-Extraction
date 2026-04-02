@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import logging
 import random
@@ -96,13 +97,18 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Override config to disable tokenizer chat-template thinking mode.",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable verbose debug logging for config resolution, inference stages, and parse summaries.",
+    )
     return parser.parse_args()
 
 
-def configure_logging() -> None:
+def configure_logging(*, debug: bool = False) -> None:
     """初始化日志。"""
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG if debug else logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
 
@@ -128,6 +134,61 @@ def build_single_example(
         user_text=text.strip(),
         gold_relations=[],
     )
+
+
+def _preview_text(text: str, *, limit: int = 240) -> str:
+    """把多行文本压平成适合日志输出的短摘要。"""
+    compact = " ".join(text.split())
+    if len(compact) <= limit:
+        return compact
+    return compact[: max(0, limit - 3)] + "..."
+
+
+def log_effective_config(config: Dict[str, Any], args: argparse.Namespace) -> None:
+    """输出解析后的关键推理配置，便于定位路径和开关问题。"""
+    model_config = config["model"]
+    inference_config = config["inference"]
+    output_config = config["output"]
+    LOGGER.info("Loaded config from %s", config.get("config_path"))
+    LOGGER.info(
+        "Resolved model sources: backend=%s allow_remote=%s base_model=%s tokenizer=%s adapter=%s",
+        config.get("backend"),
+        config.get("allow_remote_model_source"),
+        model_config.get("base_model_name_or_path"),
+        model_config.get("tokenizer_name_or_path"),
+        model_config.get("adapter_path"),
+    )
+    if args.input_text is not None:
+        LOGGER.info(
+            "Input mode: single_text chars=%s system_prompt_override=%s",
+            len(args.input_text),
+            bool(args.system_prompt),
+        )
+        LOGGER.debug("Single input preview: %s", _preview_text(args.input_text, limit=500))
+    else:
+        LOGGER.info(
+            "Input mode: dataset split=%s path=%s limit=%s",
+            config["data"].get("split"),
+            config["data"].get("input_path"),
+            config["data"].get("max_samples"),
+        )
+    LOGGER.info(
+        "Generation config: batch_size=%s max_input_length=%s max_new_tokens=%s do_sample=%s temperature=%s top_p=%s repetition_penalty=%s",
+        inference_config.get("batch_size"),
+        inference_config.get("max_input_length"),
+        inference_config.get("max_new_tokens"),
+        inference_config.get("do_sample"),
+        inference_config.get("temperature"),
+        inference_config.get("top_p"),
+        inference_config.get("repetition_penalty"),
+    )
+    LOGGER.info(
+        "Output paths: predictions=%s metrics=%s metrics_json=%s",
+        output_config.get("predictions_path"),
+        output_config.get("metrics_path"),
+        output_config.get("metrics_json_path"),
+    )
+    LOGGER.debug("Runtime cwd=%s cuda_available=%s cuda_device_count=%s", Path.cwd(), torch.cuda.is_available(), torch.cuda.device_count())
 
 
 def write_jsonl(path: Path, rows: Sequence[Dict[str, Any]]) -> None:
@@ -165,73 +226,190 @@ def write_metrics_if_available(rows: Sequence[Dict[str, Any]], config: Dict[str,
     return metrics
 
 
+def summarize_prediction_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    """汇总解析状态和预测非空率，便于快速判断推理异常。"""
+    total_rows = len(rows)
+    parsed_rows = 0
+    nonempty_rows = 0
+    relation_total = 0
+    failure_counts: Counter[str] = Counter()
+
+    for row in rows:
+        parse_status = str(row.get("parse_status", "parsed"))
+        if parse_status == "parsed":
+            parsed_rows += 1
+        else:
+            failure_reason = row.get("parse_failure_reason")
+            failure_counts[str(failure_reason) if failure_reason else "unknown"] += 1
+        predicted_relations = row.get("predicted_relations") or []
+        if predicted_relations:
+            nonempty_rows += 1
+        relation_total += len(predicted_relations)
+
+    return {
+        "total_samples": total_rows,
+        "parsed_samples": parsed_rows,
+        "parse_success_rate": (parsed_rows / total_rows) if total_rows else 0.0,
+        "nonempty_samples": nonempty_rows,
+        "predicted_nonempty_rate": (nonempty_rows / total_rows) if total_rows else 0.0,
+        "mean_predicted_relations": (relation_total / total_rows) if total_rows else 0.0,
+        "failure_counts": dict(sorted(failure_counts.items())),
+    }
+
+
+def log_prediction_debug_summary(rows: Sequence[Dict[str, Any]]) -> None:
+    """输出推理结果摘要，并对单样本/解析失败样本给出更具体的日志。"""
+    summary = summarize_prediction_rows(rows)
+    LOGGER.info(
+        "Prediction summary: total=%s parsed=%s parse_success_rate=%.3f nonempty=%s predicted_nonempty_rate=%.3f mean_predicted_relations=%.3f failure_counts=%s",
+        summary["total_samples"],
+        summary["parsed_samples"],
+        summary["parse_success_rate"],
+        summary["nonempty_samples"],
+        summary["predicted_nonempty_rate"],
+        summary["mean_predicted_relations"],
+        summary["failure_counts"],
+    )
+    if not rows:
+        return
+
+    if len(rows) == 1:
+        row = rows[0]
+        predicted_relations = row.get("predicted_relations") or []
+        LOGGER.info(
+            "Single-sample result: sample_id=%s parse_status=%s failure_reason=%s predicted_relations=%s",
+            row.get("sample_id"),
+            row.get("parse_status"),
+            row.get("parse_failure_reason"),
+            json.dumps(predicted_relations, ensure_ascii=False),
+        )
+        LOGGER.info("Single-sample raw output preview: %s", _preview_text(str(row.get("raw_output", "")), limit=800))
+        return
+
+    failure_rows = [row for row in rows if row.get("parse_status") != "parsed"][:3]
+    for row in failure_rows:
+        LOGGER.warning(
+            "Parse failure sample: sample_id=%s reason=%s raw_output_preview=%s",
+            row.get("sample_id"),
+            row.get("parse_failure_reason"),
+            _preview_text(str(row.get("raw_output", "")), limit=400),
+        )
+
+
 def main() -> None:
     """推理脚本主流程。"""
-    configure_logging()
     args = parse_args()
-    config = apply_cli_overrides(load_inference_config(args.config, validate=False), args)
+    configure_logging(debug=args.debug)
+    try:
+        config = apply_cli_overrides(load_inference_config(args.config, validate=False), args)
+    except Exception:
+        LOGGER.exception("Failed to load/resolve inference config from %s", args.config)
+        raise
     if args.enable_thinking and args.disable_thinking:
         raise ValueError("Use at most one of --enable-thinking or --disable-thinking.")
     if args.enable_thinking:
         config["model"]["enable_thinking"] = True
     elif args.disable_thinking:
         config["model"]["enable_thinking"] = False
+    log_effective_config(config, args)
     backend = str(config.get("backend", "transformers")).lower()
     set_global_seed(config["seed"], seed_cuda=backend != "vllm")
 
-    if args.input_text is not None:
-        # 单文本模式：不依赖数据文件，直接构造一个临时样本。
-        system_prompt = args.system_prompt or load_system_prompt(
-            str(config["system_prompt_path"]) if config.get("system_prompt_path") is not None else None
-        )
-        examples = [
-            build_single_example(
-                args.input_text,
-                system_prompt=system_prompt,
+    try:
+        if args.input_text is not None:
+            # 单文本模式：不依赖数据文件，直接构造一个临时样本。
+            system_prompt = args.system_prompt or load_system_prompt(
+                str(config["system_prompt_path"]) if config.get("system_prompt_path") is not None else None
             )
-        ]
-    else:
-        # 数据集模式：加载文件中的 gold_relations，便于推理后立即评估。
-        input_path = config["data"].get("input_path")
-        if input_path is None:
-            split = config["data"].get("split", "dev")
-            input_path = split_to_default_path(split)
-            config["data"]["input_path"] = input_path
-        split_name = str(config["data"].get("split") or input_path.stem).lower()
-        examples = load_dataset_examples(
-            input_path,
-            split=split_name,
-            limit=config["data"].get("max_samples"),
-        )
-        system_prompt = load_system_prompt(
-            str(config["system_prompt_path"]) if config.get("system_prompt_path") is not None else None
-        )
-        examples = [
-            DatasetExample(
-                sample_id=example.sample_id,
-                split=example.split,
-                system_prompt=system_prompt,
-                user_text=example.user_text,
-                gold_relations=example.gold_relations,
+            examples = [
+                build_single_example(
+                    args.input_text,
+                    system_prompt=system_prompt,
+                )
+            ]
+        else:
+            # 数据集模式：加载文件中的 gold_relations，便于推理后立即评估。
+            input_path = config["data"].get("input_path")
+            if input_path is None:
+                split = config["data"].get("split", "dev")
+                input_path = split_to_default_path(split)
+                config["data"]["input_path"] = input_path
+            split_name = str(config["data"].get("split") or input_path.stem).lower()
+            examples = load_dataset_examples(
+                input_path,
+                split=split_name,
+                limit=config["data"].get("max_samples"),
             )
-            for example in examples
-        ]
+            system_prompt = load_system_prompt(
+                str(config["system_prompt_path"]) if config.get("system_prompt_path") is not None else None
+            )
+            examples = [
+                DatasetExample(
+                    sample_id=example.sample_id,
+                    split=example.split,
+                    system_prompt=system_prompt,
+                    user_text=example.user_text,
+                    gold_relations=example.gold_relations,
+                )
+                for example in examples
+            ]
+    except Exception:
+        LOGGER.exception(
+            "Failed while preparing inference examples: input_text_mode=%s input_path=%s split=%s",
+            args.input_text is not None,
+            config["data"].get("input_path"),
+            config["data"].get("split"),
+        )
+        raise
 
     LOGGER.info("Loaded %s examples.", len(examples))
     LOGGER.info("Using inference backend: %s", backend)
-    if backend == "vllm":
-        llm, tokenizer, sampling_params_class, lora_request_class = load_model_and_tokenizer_vllm(config)
-        model_bundle = (llm, sampling_params_class, lora_request_class)
-    else:
-        model_bundle, tokenizer = load_model_and_tokenizer_transformers(config)
-    rows = generate_predictions(model_bundle, tokenizer, examples, config)
+    LOGGER.info("Initializing model runtime...")
+    try:
+        if backend == "vllm":
+            llm, tokenizer, sampling_params_class, lora_request_class = load_model_and_tokenizer_vllm(config)
+            model_bundle = (llm, sampling_params_class, lora_request_class)
+        else:
+            model_bundle, tokenizer = load_model_and_tokenizer_transformers(config)
+    except Exception:
+        LOGGER.exception(
+            "Failed to initialize inference runtime: backend=%s base_model=%s adapter=%s",
+            backend,
+            config["model"].get("base_model_name_or_path"),
+            config["model"].get("adapter_path"),
+        )
+        raise
+
+    try:
+        rows = generate_predictions(model_bundle, tokenizer, examples, config)
+    except Exception:
+        LOGGER.exception(
+            "Inference generation failed: backend=%s examples=%s batch_size=%s",
+            backend,
+            len(examples),
+            config["inference"].get("batch_size"),
+        )
+        raise
+    log_prediction_debug_summary(rows)
 
     predictions_path = config["output"].get("predictions_path")
     if predictions_path is not None:
-        write_jsonl(predictions_path, rows)
+        try:
+            write_jsonl(predictions_path, rows)
+        except Exception:
+            LOGGER.exception("Failed to write predictions to %s", predictions_path)
+            raise
         LOGGER.info("Saved predictions to %s", predictions_path)
 
-    metrics = write_metrics_if_available(rows, config)
+    try:
+        metrics = write_metrics_if_available(rows, config)
+    except Exception:
+        LOGGER.exception(
+            "Failed to compute/write metrics: metrics_path=%s metrics_json_path=%s",
+            config["output"].get("metrics_path"),
+            config["output"].get("metrics_json_path"),
+        )
+        raise
     if metrics is not None:
         LOGGER.info("Micro F1: %.4f", metrics["micro"]["f1"])
 
