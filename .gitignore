@@ -28,15 +28,9 @@ models/
 
 
 
-# 本地评测数据镜像
-evaluate_datasets/**
-!evaluate_datasets/**/
-!evaluate_datasets/**/README*.md
-!evaluate_datasets/**/*.md
-!evaluate_datasets/**/*.py
-!evaluate_datasets/**/*.sh
+# 评测数据通过 Git LFS 远程保留
 
-# 训练输出默认不上传；baseline 文本结果可保留，超大 adapter 仅本地保存
+# 训练输出默认不上传；baseline 文本结果可保留
 outputs/*
 !outputs/README.md
 !outputs/r4_lora_variant_baseline_results.txt
@@ -44,8 +38,4 @@ outputs/*
 outputs/baseline/*
 !outputs/baseline/**
 !outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/*
-!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/README.md
-!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/*
-!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/**
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/**

@@ -1,1 +1,10 @@
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/*.safetensors filter=lfs diff=lfs merge=lfs -text
+outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/** filter=lfs diff=lfs merge=lfs -text
+data/*.jsonl filter=lfs diff=lfs merge=lfs -text
+data/processed/** filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/MANIFEST.json filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/DATASET_INDEX.json filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/**/official_held_out/*.jsonl filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/**/light/*.jsonl filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/**/processed/** filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/**/raw/** filter=lfs diff=lfs merge=lfs -text
+evaluate_datasets/**/extracted/** filter=lfs diff=lfs merge=lfs -text
