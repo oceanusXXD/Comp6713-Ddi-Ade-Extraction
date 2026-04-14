@@ -1,0 +1,41 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments and local bootstrap directories
+.venv/
+env/
+venv/
+.gradio/
+# Tool caches and coverage outputs
+htmlcov/
+.coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Logs and editor temporary files
+*.log
+*.swp
+.DS_Store
+
+# Local model downloads
+models/
+
+# Inference and evaluation outputs
+
+
+
+# Evaluation datasets retained via Git LFS
+
+# Training outputs ignored by default; baseline text results retained
+outputs/*
+!outputs/README.md
+!outputs/r4_lora_variant_baseline_results.txt
+!outputs/baseline/
+outputs/baseline/*
+!outputs/baseline/**
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/
+!outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/**
