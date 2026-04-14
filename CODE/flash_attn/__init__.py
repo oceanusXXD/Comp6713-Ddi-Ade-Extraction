@@ -1,0 +1,5 @@
+"""Local `flash_attn` compatibility exports."""
+
+from flash_attn.ops.triton.rotary import apply_rotary
+
+__all__ = ["apply_rotary"]

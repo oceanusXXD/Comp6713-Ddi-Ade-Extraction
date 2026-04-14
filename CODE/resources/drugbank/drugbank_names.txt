@@ -1,0 +1,8 @@
+aspirin
+ibuprofen
+warfarin
+simvastatin
+erythromycin
+scopolamine
+quinine
+lithium

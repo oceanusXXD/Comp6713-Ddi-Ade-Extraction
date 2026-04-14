@@ -1,0 +1,34 @@
+# Gradio config for the base-model preset.
+# Default local base model path: `models/Qwen3-8B`.
+seed: 42
+system_prompt_path: prompts/medical_relation_extraction_system_prompt.txt
+backend: transformers
+allow_remote_model_source: true
+
+model:
+  base_model_name_or_path: models/Qwen3-8B
+  tokenizer_name_or_path: null
+  adapter_path: null
+  trust_remote_code: true
+  torch_dtype: bfloat16
+  attn_implementation: sdpa
+  enable_thinking: false
+
+data:
+  split: test
+  input_path: data/merged_chatml_test.jsonl
+  max_samples: null
+
+inference:
+  batch_size: 1
+  max_input_length: 4096
+  max_new_tokens: 1024
+  do_sample: false
+  temperature: 0.0
+  top_p: 1.0
+  repetition_penalty: 1.0
+
+output:
+  predictions_path: null
+  metrics_path: null
+  metrics_json_path: null
