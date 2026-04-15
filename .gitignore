@@ -24,9 +24,13 @@ htmlcov/
 # 本地模型下载，不上传
 models/
 
-# 推理与评测结果产物
-
-
+# 推理与评测结果产物默认忽略，仅保留整理后的归档与报告
+/results/*
+!/results/README.md
+!/results/quantitative_report.md
+!/results/quantitative_report.txt
+!/results/benchmark_suite_*/
+!/results/benchmark_suite_*/**
 
 # 评测数据通过 Git LFS 远程保留
 

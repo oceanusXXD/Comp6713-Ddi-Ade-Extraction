@@ -24,9 +24,13 @@ htmlcov/
 # Local model downloads
 models/
 
-# Inference and evaluation outputs
-
-
+# Inference and evaluation outputs are ignored by default; keep the README and
+# the retained llama snapshot metric.
+/results/*
+!/results/README.md
+!/results/model_snapshots/
+/results/model_snapshots/*
+!/results/model_snapshots/NousResearch_Meta-Llama-3-8B-Instruct_preds_metrics.txt
 
 # Evaluation datasets retained via Git LFS
 

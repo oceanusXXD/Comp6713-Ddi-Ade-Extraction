@@ -11,6 +11,13 @@ YAML configuration files for training, inference, and demo runs.
 
 Other `*.yaml` files are experiment variants.
 
+## Additional experiment variants
+
+- `qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml`: balanced epoch-3 rsLoRA run
+- `qwen3_8b_lora_ddi_ade_latest_raw_clean_baseline_e4.yaml`: baseline epoch-4 rsLoRA run
+- `qwen3_8b_lora_ddi_ade_latest_raw_clean_lowlr_e4.yaml`: lower-learning-rate epoch-4 rsLoRA run
+- `infer_exp04.yaml`: inference config paired with the low-learning-rate epoch-4 run
+
 ## Scripts that use them
 
 - `scripts/train/train_finetune.py` reads `qwen3_8b_lora_ddi_ade_final.yaml`

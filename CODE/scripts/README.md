@@ -6,7 +6,7 @@ Command-line entrypoints for data prep, training, inference, evaluation, demos, 
 
 - `train/`: `train_finetune.py`
 - `inference/`: `predict.py`
-- `evaluation/`: `evaluate_predictions.py`, `evaluate_predictions_by_augmentation.py`, `run_benchmark_suite.py`
+- `evaluation/`: `evaluate_predictions.py`, `evaluate_predictions_by_augmentation.py`, `run_benchmark_suite.py`, `quantitative_evaluation.py`
 - `analysis/`: `analyze_dataset.py`, `audit_and_prepare_final_dataset.py`, `fetch_evaluate_datasets.py`
 - `demo/`: `gradio_demo.py`
 - `experiments/`: `run_qwen3_lora_variant_benchmark.py`
@@ -51,4 +51,10 @@ Evaluate by augmentation source:
 python scripts/evaluation/evaluate_predictions_by_augmentation.py \
   --predictions-path results/inference_runs/your_predictions.jsonl \
   --source-path data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train_augmentations.jsonl
+```
+
+Generate the benchmark comparison summary:
+
+```bash
+python scripts/evaluation/quantitative_evaluation.py
 ```

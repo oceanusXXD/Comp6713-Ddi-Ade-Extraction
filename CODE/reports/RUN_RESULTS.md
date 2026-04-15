@@ -92,3 +92,8 @@ Get-ChildItem -Path . -Recurse -File -Include *.jsonl,*.parquet,*.xml,*.gz,*.zip
 ```
 
 Result: no matching files were present when this report was recorded.
+
+## Preserved historical artifact
+
+- `results/model_snapshots/NousResearch_Meta-Llama-3-8B-Instruct_preds_metrics.txt`
+  Restored from git history (commit `ec10c47`) after later cleanup removed it. It was not present when the file checks above were recorded.

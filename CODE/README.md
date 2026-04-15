@@ -24,6 +24,7 @@ Code, configs, prompts, and reports for ADE and DDI extraction.
 - Train script: `scripts/train/train_finetune.py`
 - Inference script: `scripts/inference/predict.py`
 - Evaluation script: `scripts/evaluation/evaluate_predictions.py`
+- Quantitative summary script: `scripts/evaluation/quantitative_evaluation.py`
 
 ## Setup
 
@@ -69,6 +70,12 @@ python scripts/evaluation/evaluate_predictions.py \
   --predictions-path results/inference_runs/your_predictions.jsonl
 ```
 
+Generate the benchmark comparison summary:
+
+```bash
+python scripts/evaluation/quantitative_evaluation.py
+```
+
 Start the demo:
 
 ```bash
@@ -80,4 +87,5 @@ python scripts/demo/gradio_demo.py --host 127.0.0.1 --port 7860
 - Data paths: `data/README.md`
 - Model path: `models/README.md`
 - Output paths: `outputs/README.md`
+- Results notes: `results/README.md`
 - Recorded checks: `reports/RUN_RESULTS.md`
