@@ -62,6 +62,7 @@ def evaluate_rows(
         gold_set = relations_to_set(gold_relations)
         pred_set = relations_to_set(pred_relations)
 
+        # Exact match requires the predicted relation set to be identical to the gold set.
         if gold_set == pred_set:
             exact_match_count += 1
 
@@ -118,6 +119,7 @@ def main() -> None:
     max_ade_distance_options = [8, 12]
     max_ddi_distance_options = [6, 10]
 
+    # Restrict the search space to a small number of interpretable rule variations.
     ade_trigger_extra_options = [
         [],
         ["triggered by"],
@@ -151,6 +153,7 @@ def main() -> None:
     ):
         trial_id += 1
 
+        # Initialize from the default configuration and update only the tuned parameters.
         config = dict(DEFAULT_CONFIG)
         config["MIN_EFFECT_LEN"] = min_effect_len
         config["MIN_DRUG_LEN"] = min_drug_len

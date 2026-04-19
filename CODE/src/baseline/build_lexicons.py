@@ -60,6 +60,7 @@ def main() -> None:
         messages = row.get("messages", [])
         gold_relations = extract_gold_relations(messages)
 
+        # Construct lexicons from the annotated relations in the training split.
         for rel in gold_relations:
             head = norm(rel.get("head_entity", ""))
             tail = norm(rel.get("tail_entity", ""))
@@ -77,6 +78,7 @@ def main() -> None:
 
     drugbank_count = 0
     if args.drugbank_path:
+        # Optionally merge an external drug list to improve coverage at prediction time.
         drugbank_names = load_drugbank_names(Path(args.drugbank_path))
         drugbank_count = len(drugbank_names)
         drug_lexicon.update(drugbank_names)

@@ -98,6 +98,7 @@ def find_mentions_with_positions(text: str, lexicon: List[str], min_len: int) ->
         if n == 0:
             continue
 
+        # A mention is accepted only when the normalized token sequence matches exactly.
         for i in range(len(text_tokens) - n + 1):
             span_tokens = text_tokens[i : i + n]
             if span_tokens == item_tokens:
@@ -132,6 +133,7 @@ def choose_nearest_drug(effect_mention: Dict[str, Any], drug_mentions: List[Dict
             candidates.append((dist, drug["start_token"], drug))
     if not candidates:
         return None
+    # When distances are equal, prefer the earlier mention for deterministic behavior.
     candidates.sort(key=lambda x: (x[0], x[1]))
     return candidates[0][2]
 
@@ -160,6 +162,8 @@ def predict_relations(
     effect_lexicon: List[str],
     config: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
+    # The baseline operates at sentence level: it first detects lexicon mentions, then
+    # assigns relation labels using trigger words and token-distance constraints.
     ade_triggers = config["ADE_TRIGGERS"]
     ddi_trigger_groups = {
         "DDI-advice": config["DDI_ADVICE_TRIGGERS"],
@@ -183,6 +187,7 @@ def predict_relations(
         effect_mentions = find_mentions_with_positions(sent_text, effect_lexicon, min_effect_len)
 
         if drug_mentions and effect_mentions and sentence_contains_any(sent_text, ade_triggers):
+            # For ADE, each effect mention is linked to the nearest drug mention.
             for effect in effect_mentions:
                 nearest_drug = choose_nearest_drug(
                     effect_mention=effect,
@@ -202,6 +207,7 @@ def predict_relations(
             ddi_type = None
             ddi_priority = ["DDI-advice", "DDI-mechanism", "DDI-effect", "DDI-int"]
 
+            # Apply a fixed priority order when multiple DDI trigger groups are matched.
             for rel_type in ddi_priority:
                 triggers = ddi_trigger_groups[rel_type]
                 if sentence_contains_any(sent_text, triggers):
@@ -209,6 +215,7 @@ def predict_relations(
                     break
 
             if ddi_type is not None:
+                # For DDI, only nearby adjacent drug mentions are paired.
                 ddi_pairs = choose_adjacent_drug_pairs(
                     drug_mentions=drug_mentions,
                     max_distance=max_ddi_token_distance,
@@ -267,6 +274,7 @@ def main() -> None:
                 "sample_id": f"sample_{i:04d}",
                 "text": text,
                 "gold_relations": gold_relations,
+                # Keep both string and structured outputs for later evaluation and inspection.
                 "raw_output": json.dumps(parsed_output, ensure_ascii=False),
                 "parsed_output": parsed_output,
                 "json_valid": True,
