@@ -1,0 +1,34 @@
+====================================================================================================
+COMP6713 DDI/ADE Extraction -- Quantitative Evaluation Report
+Base Model (Qwen3-8B, no fine-tuning)  vs.  LoRA Model (Qwen3-8B + rsLoRA, epoch-3, step 993)
+Metric: Micro Precision / Recall / F1  [triple-level exact match, case-insensitive]
+====================================================================================================
+
+Dataset                              Base-P   Base-R  Base-F1  |    LoRA-P   LoRA-R  LoRA-F1      dF1
+----------------------------------------------------------------------------------------------------
+[ Internal datasets -- same distribution as training data ]
+  Own Validation      (internal)      22.1%    11.1%    14.8%  |     76.5%    62.1%    68.5%  +53.7%
+  Own Test            (internal)      25.3%    16.6%    20.1%  |     69.5%    61.3%    65.2%  +45.1%
+  Seen-Style Val      (internal)      23.2%    11.2%    15.1%  |     77.2%    61.9%    68.7%  +53.6%
+  Seen-Style Test     (internal)      26.6%    17.4%    21.1%  |     69.7%    60.8%    65.0%  +43.9%
+----------------------------------------------------------------------------------------------------
+[ External / held-out datasets -- never seen during training ]
+  ADE Corpus v2       (external)      65.2%    19.6%    30.1%  |     90.5%    88.0%    89.2%  +59.1%
+  PHEE Dev            (external)      25.2%    11.3%    15.6%  |     43.9%    57.2%    49.7%  +34.1%
+  PHEE Test           (external)      26.5%    12.8%    17.2%  |     41.4%    54.9%    47.2%  +30.0%
+  DDI-2013 Test       (external)      27.6%    36.0%    31.3%  |     24.7%    56.2%    34.3%   +3.1%
+  TAC-2017 ADR Gold   (external)      43.4%     9.2%    15.2%  |     39.1%    10.4%    16.4%   +1.2%
+  CADEC MedDRA        (external)      31.9%     8.2%    13.1%  |     28.1%    18.2%    22.1%   +9.0%
+----------------------------------------------------------------------------------------------------
+
+  Avg F1 -- Internal (4 datasets)                                17.8%  |                               66.8%  +49.1%
+  Avg F1 -- External (6 datasets)                                20.4%  |                               43.1%  +22.7%
+
+Notes:
+  * Evaluation metric: triple-level exact match on (relation_type, head_entity, tail_entity),
+    with case-insensitive entity comparison.
+  * Base model: Qwen3-8B with no fine-tuning (zero-shot inference).
+  * LoRA model: Qwen3-8B fine-tuned with rsLoRA on balanced-augmented data, epoch-3 (step 993).
+  * DDI-2013: LoRA recall improves greatly but precision drops -- model over-predicts relations.
+  * TAC-2017 / CADEC: harder domain shift; both models struggle, but LoRA improves recall.
+====================================================================================================

@@ -1,0 +1,26 @@
+{
+  "python": {
+    "executable": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/.venv/bin/python",
+    "prefix": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/.venv",
+    "base_prefix": "/usr",
+    "usersite": "/home/coder/.local/lib/python3.10/site-packages",
+    "user_site_enabled": true
+  },
+  "cuda_available": true,
+  "device_count": 1,
+  "package_origins": {
+    "torch": "/usr/local/lib/python3.10/dist-packages/torch/__init__.py",
+    "transformers": "/home/coder/.local/lib/python3.10/site-packages/transformers/__init__.py",
+    "peft": "/home/coder/.local/lib/python3.10/site-packages/peft/__init__.py",
+    "vllm": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/.venv/lib/python3.10/site-packages/vllm/__init__.py"
+  },
+  "devices": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+      "total_memory_gb": 94.97,
+      "major": 12,
+      "minor": 0
+    }
+  ]
+}

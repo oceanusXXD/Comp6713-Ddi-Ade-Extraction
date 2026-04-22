@@ -1,0 +1,41 @@
+seed: 42
+system_prompt_path: prompts/medical_relation_extraction_system_prompt.txt
+backend: transformers
+allow_remote_model_source: false
+
+model:
+  base_model_name_or_path: models/Qwen3-8B
+  tokenizer_name_or_path: null
+  adapter_path: outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
+  trust_remote_code: true
+  torch_dtype: bfloat16
+  attn_implementation: sdpa
+  enable_thinking: false
+
+data:
+  split: validation
+  input_path: data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl
+  max_samples: null
+
+inference:
+  batch_size: 6
+  max_input_length: 4096
+  max_new_tokens: 1024
+  do_sample: false
+  temperature: 0.0
+  top_p: 1.0
+  repetition_penalty: 1.0
+
+vllm:
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.85
+  max_model_len: 6144
+  max_lora_rank: 32
+  max_loras: 1
+  enforce_eager: false
+  disable_log_stats: true
+
+output:
+  predictions_path: results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl
+  metrics_path: results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_metrics.txt
+  metrics_json_path: results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_metrics.json

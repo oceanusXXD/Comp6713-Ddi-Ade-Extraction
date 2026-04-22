@@ -1,0 +1,100 @@
+{
+  "internal": {
+    "train": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train.jsonl",
+      "num_rows": 4924
+    },
+    "validation": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_validation.jsonl",
+      "num_rows": 436
+    },
+    "test": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_test.jsonl",
+      "num_rows": 619
+    },
+    "augmentations": {
+      "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train_augmentations.jsonl",
+      "num_rows": 1012,
+      "augmentation_type_counts": {
+        "hardcase": 247,
+        "margincase": 265,
+        "negative": 320,
+        "paraphrase": 180
+      }
+    }
+  },
+  "external": {
+    "seen_style_core": {
+      "readme": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/README.md",
+      "validation_path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_validation.jsonl",
+      "test_path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_test.jsonl",
+      "validation_rows": 436,
+      "test_rows": 619
+    },
+    "bundles": {
+      "seen_style_core": {
+        "status": "partial",
+        "official_held_out": [
+          "/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_validation.jsonl",
+          "/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_test.jsonl"
+        ],
+        "pending_subsets": [
+          "hard",
+          "negative",
+          "schema_stability"
+        ],
+        "note": "Current repo has held-out files but no grounded slicing rules for the three requested internal subsets."
+      },
+      "ddi_transfer": {
+        "status": "complete",
+        "datasets": {
+          "DDIExtraction2013": "https://raw.githubusercontent.com/isegura/DDICorpus/master/DDICorpus-2013.zip",
+          "TAC2018_DDI": {
+            "trainingFiles.zip": "https://bionlp.nlm.nih.gov/tac2018druginteractions/trainingFiles.zip",
+            "test1Files.zip": "https://bionlp.nlm.nih.gov/tac2018druginteractions/test1Files.zip",
+            "test2Files.zip": "https://bionlp.nlm.nih.gov/tac2018druginteractions/test2Files.zip"
+          }
+        }
+      },
+      "ade_transfer": {
+        "status": "complete",
+        "datasets": {
+          "ADE_Corpus_V2": "https://huggingface.co/datasets/ade-benchmark-corpus/ade_corpus_v2",
+          "PHEE": {
+            "train.json": "https://raw.githubusercontent.com/ZhaoyueSun/PHEE/master/data/json/train.json",
+            "dev.json": "https://raw.githubusercontent.com/ZhaoyueSun/PHEE/master/data/json/dev.json",
+            "test.json": "https://raw.githubusercontent.com/ZhaoyueSun/PHEE/master/data/json/test.json"
+          },
+          "PHEE_v2_note": "https://github.com/ZhaoyueSun/phee-with-chatgpt"
+        }
+      },
+      "pharmacovigilance_cross_genre": {
+        "status": "complete",
+        "datasets": {
+          "TAC2017_ADR": {
+            "train_xml.tar.gz": "https://bionlp.nlm.nih.gov/tac2017adversereactions/train_xml.tar.gz",
+            "gold_xml.tar.gz": "https://bionlp.nlm.nih.gov/tac2017adversereactions/gold_xml.tar.gz",
+            "unannotated_xml.tar.gz": "https://bionlp.nlm.nih.gov/tac2017adversereactions/unannotated_xml.tar.gz"
+          },
+          "CADEC": "https://data.csiro.au/dap/ws/v2/collections/17190/data"
+        }
+      },
+      "general_guardrails": {
+        "status": "complete",
+        "datasets": {
+          "IFEval": "https://huggingface.co/datasets/google/IFEval",
+          "DocRED": "https://huggingface.co/datasets/thunlp/docred",
+          "LongBench_full_raw": "https://huggingface.co/datasets/zai-org/LongBench",
+          "LongBench_light_counts": {
+            "multifieldqa_en": 25,
+            "multifieldqa_zh": 25,
+            "passage_retrieval_en": 25,
+            "passage_retrieval_zh": 25,
+            "gov_report": 25,
+            "vcsum": 25
+          }
+        }
+      }
+    }
+  }
+}

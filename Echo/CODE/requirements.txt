@@ -1,0 +1,13 @@
+datasets>=2.18.0
+transformers>=4.57.0
+torch>=2.1.0
+accelerate>=0.28.0
+peft>=0.14.0
+PyYAML>=6.0.0
+pandas>=2.1.0
+python-dotenv>=1.0.1
+tqdm>=4.66.0
+vllm>=0.14.1
+gradio>=4.44.0
+# Optional: only needed when finetune_type=qlora / load_in_4bit=true.
+# bitsandbytes>=0.45.0

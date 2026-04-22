@@ -1,0 +1,80 @@
+{
+  "path": "/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl",
+  "num_rows": 588,
+  "label_counts": {
+    "ADE": 579,
+    "DDI-ADVISE": 297,
+    "DDI-EFFECT": 550,
+    "DDI-INT": 52,
+    "DDI-MECHANISM": 480
+  },
+  "raw_relation_total": 1958,
+  "normalized_relation_total": 1958,
+  "duplicate_relation_examples": 0,
+  "relations_per_example": {
+    "min": 1,
+    "max": 39,
+    "mean": 3.3299319727891157,
+    "median": 1.0,
+    "p90": 8,
+    "p95": 14,
+    "p99": 25
+  },
+  "user_word_lengths": {
+    "min": 2,
+    "max": 1190,
+    "mean": 85.67857142857143,
+    "median": 24.0,
+    "p90": 247,
+    "p95": 399,
+    "p99": 689
+  },
+  "user_char_lengths": {
+    "min": 24,
+    "max": 8980,
+    "mean": 633.1292517006802,
+    "median": 174.0,
+    "p90": 1842,
+    "p95": 3040,
+    "p99": 5166
+  },
+  "target_char_lengths": {
+    "min": 65,
+    "max": 3408,
+    "mean": 296.9438775510204,
+    "median": 120.5,
+    "p90": 697,
+    "p95": 1224,
+    "p99": 2175
+  },
+  "prompt_token_lengths": {
+    "min": 297,
+    "max": 2403,
+    "mean": 436.41326530612247,
+    "median": 328.0,
+    "p90": 727,
+    "p95": 944,
+    "p99": 1488
+  },
+  "full_token_lengths": {
+    "min": 321,
+    "max": 2973,
+    "mean": 520.7534013605442,
+    "median": 366.0,
+    "p90": 906,
+    "p95": 1361,
+    "p99": 2014
+  },
+  "target_token_lengths": {
+    "min": 21,
+    "max": 983,
+    "mean": 84.34013605442176,
+    "median": 34.0,
+    "p90": 198,
+    "p95": 348,
+    "p99": 601
+  },
+  "examples_over_max_length": 0,
+  "examples_over_max_length_rate": 0.0,
+  "max_length": 4096
+}
