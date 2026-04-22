@@ -31,16 +31,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-import gradio as gr
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import torch
+import gradio as gr
 
 from src.inference_backends import (
     generate_predictions,
+    load_model_and_tokenizer_api,
     load_model_and_tokenizer_transformers,
     load_model_and_tokenizer_vllm,
 )
@@ -62,8 +62,8 @@ DEFAULT_CHAT_SYSTEM_PROMPT = "You are a helpful assistant."
 
 # (dropdown label, path to infer YAML). Keep the UI aligned with the adapters that are actually present in-repo.
 MODEL_PRESETS: List[Tuple[str, str]] = [
-    ("Base only (Qwen3-8B)", "configs/infer_gradio_base.yaml"),
-    ("+ LoRA (repo adapter)", "configs/infer_gradio_balanced_e3.yaml"),
+    ("Base", "configs/infer_gradio_base.yaml"),
+    ("LoRA", "configs/infer_gradio_balanced_e3.yaml"),
 ]
 
 DEMO_CUSTOM_CSS = """
@@ -185,24 +185,29 @@ def build_example_catalog(limit: int = 128) -> List[Dict[str, Any]]:
 def _prepare_config_for_demo(config_rel: str) -> Dict[str, Any]:
     cfg_path = (PROJECT_ROOT / config_rel).resolve()
     cfg = load_inference_config(cfg_path, validate=False)
-    # Keep Gradio independent from CLI benchmark/eval paths and vLLM-side engine lifecycle.
-    cfg["backend"] = "transformers"
+    # Keep Gradio independent from CLI benchmark/eval paths.
     cfg["data"]["input_path"] = None
     cfg["output"]["predictions_path"] = None
     cfg["output"]["metrics_path"] = None
     cfg["output"]["metrics_json_path"] = None
     cfg["inference"]["batch_size"] = 1
     cfg["inference"]["max_new_tokens"] = min(int(cfg["inference"]["max_new_tokens"]), 256)
+    backend = str(cfg.get("backend", "transformers")).lower()
     env_base = os.environ.get("COMP6713_BASE_MODEL", "").strip()
-    if env_base:
+    if env_base and backend != "api":
         cfg["allow_remote_model_source"] = True
         cfg["model"]["base_model_name_or_path"] = resolve_model_source(
             env_base,
             allow_remote=True,
         )
+    cfg["_demo_config_rel"] = config_rel
+    if backend == "api":
+        cfg["_demo_adapter_resolution"] = "remote"
+        cfg["_demo_adapter_configured_path"] = cfg["model"].get("adapter_path")
+        return cfg
+
     configured_adapter_path = cfg["model"].get("adapter_path")
     resolved_adapter_path, resolution_note = resolve_adapter_for_demo(configured_adapter_path)
-    cfg["_demo_config_rel"] = config_rel
     cfg["_demo_adapter_resolution"] = resolution_note
     cfg["_demo_adapter_configured_path"] = configured_adapter_path
     cfg["model"]["adapter_path"] = resolved_adapter_path
@@ -217,6 +222,9 @@ def available_model_presets() -> List[Tuple[str, str]]:
             cfg = _prepare_config_for_demo(config_rel)
         except Exception:
             LOGGER.exception("Skipping preset %s because config preparation failed.", preset_label)
+            continue
+        if str(cfg.get("backend", "transformers")).lower() == "api":
+            available.append((preset_label, config_rel))
             continue
         adapter_path = cfg["model"].get("adapter_path")
         configured_adapter_path = cfg.get("_demo_adapter_configured_path")
@@ -656,6 +664,167 @@ def run_one_inference(
     )
 
 
+def format_model_status_md(cfg: Dict[str, Any], preset_label: str, config_rel: str) -> str:
+    """Front-end safe status card without backend or endpoint details."""
+    adapter = cfg["model"].get("adapter_path")
+    mode_line = "LoRA" if adapter else "Base"
+    lines = [
+        "### Model status",
+        f"- **Selected**: {preset_label}",
+        f"- **Mode**: {mode_line}",
+        f"- **Task profile**: {_config_profile_label(config_rel)}",
+        f"- **Response budget**: {cfg['inference']['max_new_tokens']} tokens",
+    ]
+    return "\n".join(lines)
+
+
+def load_runtime(preset_label: str) -> Tuple[str, str]:
+    """Load or switch weights. Returns (markdown status, error string or empty)."""
+    global _RUNTIME
+    mapping = dict(MODEL_PRESETS)
+    config_rel = mapping.get(preset_label)
+    if not config_rel:
+        return "### Load status\nUnknown preset.", "unknown_preset"
+
+    unload_runtime()
+    try:
+        cfg = _prepare_config_for_demo(config_rel)
+        backend = str(cfg.get("backend", "transformers")).lower()
+        if backend == "api":
+            bundle, tokenizer = load_model_and_tokenizer_api(cfg)
+            _RUNTIME = LoadedDemoModel(preset_label, cfg, bundle, tokenizer)
+        elif backend == "vllm":
+            llm, tokenizer, sp, lr = load_model_and_tokenizer_vllm(cfg)
+            _RUNTIME = LoadedDemoModel(preset_label, cfg, (llm, sp, lr), tokenizer)
+        else:
+            model, tokenizer = load_model_and_tokenizer_transformers(cfg)
+            _RUNTIME = LoadedDemoModel(preset_label, cfg, model, tokenizer)
+        body = format_model_status_md(cfg, preset_label, config_rel)
+        return body + "\n\n**Load status**: ready.", ""
+    except Exception:
+        LOGGER.exception("Model load failed for %s", preset_label)
+        unload_runtime()
+        return (
+            "### Model status\n"
+            f"- **Selected**: {preset_label}\n"
+            "- **Status**: unavailable.",
+            "model_unavailable",
+        )
+
+
+def run_one_inference(
+    user_text: str,
+    preset_label: str,
+    task_mode: str,
+    system_prompt_override: str,
+    example_value: Any,
+    catalog: List[Dict[str, Any]],
+) -> Tuple[Any, ...]:
+    """Run one forward pass and keep frontend errors generic."""
+    user_text = (user_text or "").strip()
+    if not user_text:
+        return (
+            "",
+            "<p><em>Enter medical text to run inference.</em></p>",
+            gr.update(value=[]),
+            "",
+            gold_markdown([]),
+            "### Timing\n(not run)",
+            gr.update(value=""),
+            "### Error analysis\n(not run)",
+        )
+
+    err = ensure_runtime(preset_label)
+    if err:
+        return (
+            "",
+            "<p><em>The selected model is temporarily unavailable.</em></p>",
+            gr.update(value=[]),
+            "",
+            gold_markdown([]),
+            "### Timing\n(load failed)",
+            gr.update(value=""),
+            "### Error analysis\nThe selected model is temporarily unavailable.",
+        )
+
+    assert _RUNTIME is not None
+    cfg = _RUNTIME.config
+    system_prompt = resolve_demo_system_prompt(task_mode, system_prompt_override, cfg)
+
+    gold: List[Dict[str, str]] = []
+    if task_mode == EXTRACTION_MODE and isinstance(example_value, int) and 0 <= example_value < len(catalog):
+        gold = list(catalog[example_value]["gold"])
+
+    example = DatasetExample(
+        sample_id="gradio_single",
+        split="gradio",
+        system_prompt=system_prompt,
+        user_text=user_text,
+        gold_relations=gold,
+    )
+
+    t0 = time.perf_counter()
+    try:
+        rows = generate_predictions(_RUNTIME.bundle, _RUNTIME.tokenizer, [example], cfg)
+    except Exception:
+        LOGGER.exception("Inference failed for preset %s", preset_label)
+        return (
+            "",
+            "<p><em>Inference is unavailable right now. Check the server configuration.</em></p>",
+            gr.update(value=[]),
+            "",
+            gold_markdown(gold),
+            "### Timing\n(request failed)",
+            gr.update(value=""),
+            "### Error analysis\nThe request did not complete successfully.",
+        )
+    elapsed = time.perf_counter() - t0
+
+    row = rows[0]
+    predicted = row.get("predicted_relations") or []
+    raw_out = str(row.get("raw_output", ""))
+    parse_status = str(row.get("parse_status", ""))
+    parse_reason = row.get("parse_failure_reason")
+    assistant_response = raw_out
+
+    if task_mode == EXTRACTION_MODE:
+        viz = highlight_text(user_text, predicted)
+        table, json_pretty = predictions_table(predicted, gold)
+        stats_lines = [
+            "### Timing",
+            f"- **Wall time**: {elapsed * 1000.0:.1f} ms",
+            f"- **Mode**: `{task_mode}`",
+            f"- **Parse status**: `{parse_status}`",
+        ]
+        err_md = error_attribution_markdown(gold, predicted, parse_status, parse_reason, raw_out)
+    else:
+        viz = highlight_text(user_text, [])
+        table = [["(n/a)", "(n/a)", "(n/a)", "raw chat mode"]]
+        json_pretty = ""
+        stats_lines = [
+            "### Timing",
+            f"- **Wall time**: {elapsed * 1000.0:.1f} ms",
+            f"- **Mode**: `{task_mode}`",
+            "- **Structured parse**: disabled in raw chat mode",
+        ]
+        err_md = (
+            "### Response mode\n"
+            "Raw chat mode does not require a dataset or gold labels. "
+            "The textbox above is the direct model output."
+        )
+    stats_md = "\n".join(stats_lines)
+    return (
+        assistant_response,
+        viz,
+        gr.update(value=table),
+        json_pretty,
+        gold_markdown(gold),
+        stats_md,
+        gr.update(value=raw_out),
+        err_md,
+    )
+
+
 def build_demo(catalog: List[Dict[str, Any]]) -> gr.Blocks:
     example_choices: List[Tuple[str, int]] = [("(custom input)", -1)]
     for i, item in enumerate(catalog):
@@ -739,7 +908,7 @@ def build_demo(catalog: List[Dict[str, Any]]) -> gr.Blocks:
                 gr.Markdown('<p class="demo-side-title">Controls</p>')
 
                 model_select = gr.Dropdown(
-                    label="Model preset (loads on change)",
+                    label="Model",
                     choices=[x[0] for x in MODEL_PRESETS],
                     value=default_preset,
                     elem_id="demo_model_preset",
@@ -750,11 +919,9 @@ def build_demo(catalog: List[Dict[str, Any]]) -> gr.Blocks:
                     value=EXTRACTION_MODE,
                 )
                 model_status = gr.Markdown(
-                    "### Model & config\n"
-                    "- **Preset**: loading selected preset\n"
-                    "- **Profile**: preparing model summary\n"
-                    "- **Runtime**: Transformers\n"
-                    "- **Status**: loading on page open"
+                    "### Model status\n"
+                    "- **Selected**: loading\n"
+                    "- **Status**: preparing"
                 )
 
                 with gr.Group(visible=False) as system_prompt_group:

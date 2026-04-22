@@ -1,12 +1,12 @@
 seed: 42
 system_prompt_path: prompts/medical_relation_extraction_system_prompt.txt
-backend: api
+backend: transformers
 allow_remote_model_source: true
 
 model:
-  base_model_name_or_path: qwen2.5-14b-instruct
+  base_model_name_or_path: models/Qwen3-8B
   tokenizer_name_or_path: null
-  adapter_path: null
+  adapter_path: outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
   trust_remote_code: true
   torch_dtype: bfloat16
   attn_implementation: sdpa
@@ -26,13 +26,14 @@ inference:
   top_p: 1.0
   repetition_penalty: 1.0
 
-api:
-  base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-  api_key_env: QWEN_API_KEY
-  api_key: null
-  timeout_seconds: 120
-  base_model_name: qwen2.5-14b-instruct
-  lora_model_name: qwen3.6-max-preview
+vllm:
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.85
+  max_model_len: 6144
+  max_lora_rank: 32
+  max_loras: 1
+  enforce_eager: false
+  disable_log_stats: true
 
 output:
   predictions_path: null

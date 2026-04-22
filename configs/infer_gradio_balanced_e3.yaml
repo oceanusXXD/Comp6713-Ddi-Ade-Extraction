@@ -1,13 +1,12 @@
-# Gradio：仓库内可直接使用的 LoRA adapter，路径保持仓库相对路径，便于跨机器复用。
 seed: 42
 system_prompt_path: prompts/medical_relation_extraction_system_prompt.txt
-backend: transformers
+backend: api
 allow_remote_model_source: true
 
 model:
-  base_model_name_or_path: ../models/Qwen3-8B
+  base_model_name_or_path: qwen2.5-14b-instruct
   tokenizer_name_or_path: null
-  adapter_path: outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
+  adapter_path: remote_lora
   trust_remote_code: true
   torch_dtype: bfloat16
   attn_implementation: sdpa
@@ -35,6 +34,14 @@ vllm:
   max_loras: 1
   enforce_eager: false
   disable_log_stats: true
+
+api:
+  base_url: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+  api_key_env: QWEN_API_KEY
+  api_key: null
+  timeout_seconds: 120
+  base_model_name: qwen2.5-14b-instruct
+  lora_model_name: qwen3.6-max-preview
 
 output:
   predictions_path: null

@@ -7,6 +7,7 @@ __pycache__/
 .venv/
 env/
 venv/
+.env
 .gradio/
 # 工具缓存与覆盖率产物
 htmlcov/

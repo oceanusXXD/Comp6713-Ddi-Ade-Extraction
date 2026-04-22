@@ -10,11 +10,15 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import logging
+import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
+from urllib import error as urllib_error
+from urllib import request as urllib_request
 
 import torch
 from transformers import AutoModelForCausalLM
@@ -33,6 +37,7 @@ from src.parser import (
 from src.prompting import apply_chat_template, build_messages
 
 LOGGER = logging.getLogger(__name__)
+DEFAULT_API_KEY_ENV_NAMES = ("QWEN_API_KEY", "DASHSCOPE_API_KEY", "ALIYUN_API_KEY")
 
 
 def resolve_tokenizer_source(model_config: Dict[str, Any]) -> str:
@@ -178,6 +183,137 @@ def load_model_and_tokenizer_vllm(config: Dict[str, Any]):
         hf_token=False,
     )
     return llm, tokenizer, SamplingParams, LoRARequest
+
+
+def load_runtime_dotenv(project_root: Path) -> None:
+    """Load available `.env` files when python-dotenv is installed."""
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+
+    candidates = [
+        project_root / ".env",
+        project_root / "Echo" / "CODE" / ".env",
+        Path.cwd() / ".env",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            load_dotenv(candidate, override=True)
+
+
+def resolve_api_key(config: Dict[str, Any]) -> str:
+    """Resolve API key from config or environment."""
+    project_root = Path(config.get("config_path", Path.cwd())).resolve().parent.parent
+    load_runtime_dotenv(project_root)
+
+    api_config = config.get("api", {})
+    inline_api_key = str(api_config.get("api_key") or "").strip()
+    if inline_api_key:
+        return inline_api_key
+
+    candidate_env_names: List[str] = []
+    configured_env_name = str(api_config.get("api_key_env") or "").strip()
+    if configured_env_name:
+        candidate_env_names.append(configured_env_name)
+    for env_name in DEFAULT_API_KEY_ENV_NAMES:
+        if env_name not in candidate_env_names:
+            candidate_env_names.append(env_name)
+
+    for env_name in candidate_env_names:
+        value = os.getenv(env_name)
+        if value and value.strip():
+            return value.strip()
+
+    raise RuntimeError("API key not configured.")
+
+
+def resolve_api_model_name(config: Dict[str, Any]) -> str:
+    """Resolve the effective remote model id for the request."""
+    api_config = config.get("api", {})
+    adapter_path = config["model"].get("adapter_path")
+    if adapter_path is None:
+        return str(api_config.get("base_model_name") or "").strip()
+    return str(api_config.get("lora_model_name") or "").strip()
+
+
+def load_model_and_tokenizer_api(config: Dict[str, Any]):
+    """Prepare an OpenAI-compatible API bundle."""
+    api_config = config.get("api", {})
+    bundle = {
+        "base_url": str(api_config.get("base_url") or "").rstrip("/"),
+        "timeout_seconds": int(api_config.get("timeout_seconds", 120)),
+    }
+    return bundle, None
+
+
+def extract_api_response_text(payload: Dict[str, Any]) -> str:
+    """Extract assistant text from an OpenAI-compatible chat completion payload."""
+    choices = payload.get("choices")
+    if isinstance(choices, list) and choices:
+        message = choices[0].get("message") or {}
+        content = message.get("content", "")
+        if isinstance(content, str):
+            return content.strip()
+        if isinstance(content, list):
+            parts: List[str] = []
+            for item in content:
+                if isinstance(item, dict) and item.get("type") == "text":
+                    parts.append(str(item.get("text", "")))
+                elif isinstance(item, str):
+                    parts.append(item)
+            return "".join(parts).strip()
+    raise ValueError("API response did not include choices[0].message.content.")
+
+
+def call_openai_compatible_chat_api(
+    *,
+    config: Dict[str, Any],
+    api_bundle: Dict[str, Any],
+    example: DatasetExample,
+) -> str:
+    """Call the configured OpenAI-compatible chat completion endpoint."""
+    inference_config = config["inference"]
+    model_name = resolve_api_model_name(config)
+    if not model_name:
+        raise RuntimeError("No remote model id resolved for backend=api.")
+
+    payload: Dict[str, Any] = {
+        "model": model_name,
+        "messages": build_messages(example.system_prompt, example.user_text),
+        "max_tokens": int(inference_config["max_new_tokens"]),
+        "stream": False,
+    }
+    if bool(inference_config.get("do_sample", False)):
+        payload["temperature"] = float(inference_config.get("temperature", 0.0))
+        payload["top_p"] = float(inference_config.get("top_p", 1.0))
+    else:
+        payload["temperature"] = 0.0
+
+    request = urllib_request.Request(
+        url=f"{api_bundle['base_url']}/chat/completions",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {resolve_api_key(config)}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib_request.urlopen(request, timeout=api_bundle["timeout_seconds"]) as response:
+            body = response.read().decode("utf-8")
+    except urllib_error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="replace").strip()
+        raise RuntimeError(f"API request failed with HTTP {exc.code}: {error_body[:800]}") from exc
+    except urllib_error.URLError as exc:
+        raise RuntimeError(f"API request failed: {exc.reason}") from exc
+
+    try:
+        parsed_body = json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"API response was not valid JSON: {body[:800]}") from exc
+
+    return extract_api_response_text(parsed_body)
 
 
 def model_input_device(model: Any) -> torch.device:
@@ -329,6 +465,30 @@ def generate_predictions_vllm(
     return results
 
 
+def generate_predictions_api(
+    api_bundle: Dict[str, Any],
+    _tokenizer: Any,
+    examples: Sequence[DatasetExample],
+    config: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    """Run prediction requests through an OpenAI-compatible API backend."""
+    results: List[Dict[str, Any]] = []
+    selected_model_name = resolve_api_model_name(config)
+
+    for index, example in enumerate(examples, start=1):
+        raw_output = call_openai_compatible_chat_api(
+            config=config,
+            api_bundle=api_bundle,
+            example=example,
+        )
+        row = build_prediction_row(example=example, raw_output=raw_output, config=config)
+        row["model_name_or_path"] = selected_model_name
+        results.append(row)
+        LOGGER.info("Processed %s/%s samples via api backend.", index, len(examples))
+
+    return results
+
+
 def generate_predictions(
     model_bundle: Any,
     tokenizer: Any,
@@ -347,4 +507,6 @@ def generate_predictions(
             sampling_params_class=sampling_params_class,
             lora_request_class=lora_request_class,
         )
+    if backend == "api":
+        return generate_predictions_api(model_bundle, tokenizer, examples, config)
     return generate_predictions_transformers(model_bundle, tokenizer, examples, config)

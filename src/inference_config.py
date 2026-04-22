@@ -1,4 +1,4 @@
-"""推理配置加载与命令行覆盖工具。"""
+"""Inference-config loading, validation, and CLI override helpers."""
 
 from __future__ import annotations
 
@@ -52,6 +52,14 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
         "enforce_eager": False,
         "disable_log_stats": True,
     },
+    "api": {
+        "base_url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+        "api_key_env": "QWEN_API_KEY",
+        "api_key": None,
+        "timeout_seconds": 120,
+        "base_model_name": "qwen2.5-14b-instruct",
+        "lora_model_name": "qwen3.6-max-preview",
+    },
     "output": {
         "predictions_path": "results/inference_runs/qwen3_8b_dev_predictions.jsonl",
         "metrics_path": "results/inference_runs/qwen3_8b_dev_metrics.txt",
@@ -61,7 +69,7 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
 
 
 def split_to_default_path(split: str) -> Path:
-    """把简写 split 名称映射到仓库默认数据路径。"""
+    """Map a short split alias to the package's default dataset path."""
     normalized = split.strip().lower()
     if normalized == "dev":
         normalized = "validation"
@@ -71,12 +79,12 @@ def split_to_default_path(split: str) -> Path:
 
 
 def resolve_output_path(value: Optional[str]) -> Optional[Path]:
-    """解析输出文件路径。"""
+    """Resolve an output file path relative to the project root."""
     return resolve_project_path(value)
 
 
 def load_inference_config(config_path: str | Path, *, validate: bool = True) -> Dict[str, Any]:
-    """读取推理配置，并把路径、模型来源和输出路径都解析成可执行状态。"""
+    """Load the inference config and resolve runtime paths."""
     config_path = Path(config_path).expanduser().resolve()
     with config_path.open("r", encoding="utf-8") as handle:
         loaded = yaml.safe_load(handle) or {}
@@ -88,17 +96,36 @@ def load_inference_config(config_path: str | Path, *, validate: bool = True) -> 
     if config["data"].get("split") is not None:
         config["data"]["split"] = str(config["data"]["split"])
     config["system_prompt_path"] = resolve_project_path(config.get("system_prompt_path"))
+
+    backend = str(config.get("backend", "transformers")).lower()
     allow_remote = bool(config.get("allow_remote_model_source", False))
-    config["model"]["base_model_name_or_path"] = resolve_model_source(
-        config["model"].get("base_model_name_or_path"),
-        allow_remote=allow_remote,
-    )
-    config["model"]["tokenizer_name_or_path"] = resolve_model_source(
-        config["model"].get("tokenizer_name_or_path"),
-        allow_remote=allow_remote,
-    )
+
+    if backend == "api":
+        if config["model"].get("base_model_name_or_path") is not None:
+            config["model"]["base_model_name_or_path"] = str(config["model"]["base_model_name_or_path"]).strip()
+        if config["model"].get("tokenizer_name_or_path") is not None:
+            config["model"]["tokenizer_name_or_path"] = str(config["model"]["tokenizer_name_or_path"]).strip()
+        if config["model"].get("adapter_path") is not None:
+            config["model"]["adapter_path"] = str(config["model"]["adapter_path"]).strip() or None
+        config["api"]["base_url"] = str(config["api"].get("base_url") or "").rstrip("/")
+        if config["api"].get("api_key_env") is not None:
+            config["api"]["api_key_env"] = str(config["api"]["api_key_env"]).strip()
+        if config["api"].get("api_key") is not None:
+            config["api"]["api_key"] = str(config["api"]["api_key"]).strip() or None
+        config["api"]["base_model_name"] = str(config["api"].get("base_model_name") or "").strip()
+        config["api"]["lora_model_name"] = str(config["api"].get("lora_model_name") or "").strip()
+    else:
+        config["model"]["base_model_name_or_path"] = resolve_model_source(
+            config["model"].get("base_model_name_or_path"),
+            allow_remote=allow_remote,
+        )
+        config["model"]["tokenizer_name_or_path"] = resolve_model_source(
+            config["model"].get("tokenizer_name_or_path"),
+            allow_remote=allow_remote,
+        )
+        config["model"]["adapter_path"] = resolve_project_path(config["model"].get("adapter_path"))
+
     config["data"]["input_path"] = resolve_project_path(config["data"].get("input_path"))
-    config["model"]["adapter_path"] = resolve_project_path(config["model"].get("adapter_path"))
     config["output"]["predictions_path"] = resolve_output_path(config["output"].get("predictions_path"))
     config["output"]["metrics_path"] = resolve_output_path(config["output"].get("metrics_path"))
     config["output"]["metrics_json_path"] = resolve_output_path(config["output"].get("metrics_json_path"))
@@ -108,21 +135,37 @@ def load_inference_config(config_path: str | Path, *, validate: bool = True) -> 
 
 
 def validate_inference_config(config: Dict[str, Any]) -> None:
-    """在真正启动推理前验证关键推理配置。"""
+    """Validate the critical inference settings before execution starts."""
     backend = str(config.get("backend", "transformers")).lower()
-    if backend not in {"transformers", "vllm"}:
-        raise ValueError("backend must be either 'transformers' or 'vllm'.")
-    allow_remote = bool(config.get("allow_remote_model_source", False))
-    validate_local_model_source(
-        config["model"].get("base_model_name_or_path"),
-        "Base model path",
-        allow_remote=allow_remote,
-    )
-    validate_local_model_source(
-        config["model"].get("tokenizer_name_or_path"),
-        "Tokenizer path",
-        allow_remote=allow_remote,
-    )
+    if backend not in {"transformers", "vllm", "api"}:
+        raise ValueError("backend must be one of: transformers, vllm, api.")
+
+    if backend == "api":
+        api_config = config.get("api", {})
+        if not str(api_config.get("base_url") or "").strip():
+            raise ValueError("api.base_url must be a non-empty URL for backend=api.")
+        if not str(api_config.get("base_model_name") or "").strip():
+            raise ValueError("api.base_model_name must be a non-empty model id for backend=api.")
+        if not str(api_config.get("lora_model_name") or "").strip():
+            raise ValueError("api.lora_model_name must be a non-empty model id for backend=api.")
+        if int(api_config.get("timeout_seconds", 0)) <= 0:
+            raise ValueError("api.timeout_seconds must be a positive integer.")
+    else:
+        allow_remote = bool(config.get("allow_remote_model_source", False))
+        validate_local_model_source(
+            config["model"].get("base_model_name_or_path"),
+            "Base model path",
+            allow_remote=allow_remote,
+        )
+        validate_local_model_source(
+            config["model"].get("tokenizer_name_or_path"),
+            "Tokenizer path",
+            allow_remote=allow_remote,
+        )
+        adapter_path = config["model"].get("adapter_path")
+        if adapter_path is not None and not adapter_path.exists():
+            raise FileNotFoundError(f"Adapter path not found: {adapter_path}")
+
     if config["inference"]["batch_size"] <= 0:
         raise ValueError("inference.batch_size must be a positive integer.")
     if config["inference"]["max_input_length"] <= 0:
@@ -133,13 +176,10 @@ def validate_inference_config(config: Dict[str, Any]) -> None:
         raise FileNotFoundError(f"Input dataset not found: {config['data']['input_path']}")
     if config.get("system_prompt_path") is not None and not config["system_prompt_path"].exists():
         raise FileNotFoundError(f"System prompt path not found: {config['system_prompt_path']}")
-    adapter_path = config["model"].get("adapter_path")
-    if adapter_path is not None and not adapter_path.exists():
-        raise FileNotFoundError(f"Adapter path not found: {adapter_path}")
 
 
 def apply_cli_overrides(config: Dict[str, Any], args: Any) -> Dict[str, Any]:
-    """把命令行参数覆盖到 YAML 配置上。"""
+    """Apply CLI overrides on top of a loaded inference config."""
     merged = deep_merge_dict(config, {})
     if args.backend is not None:
         merged["backend"] = args.backend
@@ -160,13 +200,24 @@ def apply_cli_overrides(config: Dict[str, Any], args: Any) -> Dict[str, Any]:
     if args.temperature is not None:
         merged["inference"]["temperature"] = args.temperature
         merged["inference"]["do_sample"] = args.temperature > 0.0
+
+    backend = str(merged.get("backend", "transformers")).lower()
     if args.base_model is not None:
-        merged["model"]["base_model_name_or_path"] = resolve_model_source(
-            args.base_model,
-            allow_remote=bool(merged.get("allow_remote_model_source", False)),
-        )
+        if backend == "api":
+            merged["model"]["base_model_name_or_path"] = str(args.base_model).strip()
+            merged["api"]["base_model_name"] = str(args.base_model).strip()
+        else:
+            merged["model"]["base_model_name_or_path"] = resolve_model_source(
+                args.base_model,
+                allow_remote=bool(merged.get("allow_remote_model_source", False)),
+            )
     if args.adapter_path is not None:
-        merged["model"]["adapter_path"] = resolve_project_path(args.adapter_path)
+        if backend == "api":
+            merged["model"]["adapter_path"] = str(args.adapter_path).strip() or None
+            if merged["model"]["adapter_path"] is not None:
+                merged["api"]["lora_model_name"] = str(args.adapter_path).strip()
+        else:
+            merged["model"]["adapter_path"] = resolve_project_path(args.adapter_path)
     if args.output_path is not None:
         merged["output"]["predictions_path"] = resolve_output_path(args.output_path)
     if args.metrics_path is not None:
