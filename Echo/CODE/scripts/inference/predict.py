@@ -408,7 +408,14 @@ def main() -> None:
     args = parse_args()
     configure_logging(debug=args.debug)
 
-    config = build_runtime_config(args)
+    try:
+        config = build_runtime_config(args)
+    except FileNotFoundError as exc:
+        raise SystemExit(
+            f"{exc}\n"
+            "Download the base model first with:\n"
+            "bash scripts/setup/download_base_model.sh"
+        ) from exc
     set_global_seed(int(config.get("seed", 42)))
     log_runtime_configuration(config, args)
 

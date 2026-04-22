@@ -7,6 +7,7 @@ This package keeps only the main command-line entrypoints needed for the core re
 - `train/train_finetune.py`: training entrypoint
 - `inference/predict.py`: batch and single-text inference entrypoint
 - `gradio/app.py`: single-text Gradio demo entrypoint
+- `setup/download_base_model.sh`: helper script to place the base model under `models/Qwen3-8B`
 - `evaluation/evaluate_predictions.py`: prediction-file evaluation entrypoint
 - `evaluation/quantitative_evaluation.py`: summary-level comparison report generation
 

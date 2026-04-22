@@ -917,7 +917,11 @@ def main() -> None:
     global MODEL_PRESETS
     MODEL_PRESETS = available_model_presets()
     if not MODEL_PRESETS:
-        raise RuntimeError("No runnable model presets found for the Gradio demo.")
+        raise RuntimeError(
+            "No runnable model presets found for the Gradio demo.\n"
+            "Download the base model first with:\n"
+            "bash scripts/setup/download_base_model.sh"
+        )
     catalog = build_example_catalog(limit=args.example_limit)
 
     demo = build_demo(catalog)

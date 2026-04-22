@@ -53,6 +53,34 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
+If `huggingface_hub` is missing in your environment, install it as well because the
+download helper below uses it directly:
+
+```bash
+python -m pip install huggingface_hub
+```
+
+## Download The Base Model
+
+The package does not bundle `models/Qwen3-8B`. Download it into the expected path with:
+
+```bash
+bash scripts/setup/download_base_model.sh
+```
+
+Optional arguments:
+
+```bash
+bash scripts/setup/download_base_model.sh Qwen/Qwen3-8B /absolute/path/to/models/Qwen3-8B
+```
+
+Notes:
+
+- Set `HF_TOKEN` in your shell first if the model requires an authenticated Hugging Face session.
+- The default destination is `models/Qwen3-8B`, which matches the packaged Echo configs.
+- If you store the model somewhere else, use `--base-model /path/to/Qwen3-8B` for CLI inference,
+  or set `COMP6713_BASE_MODEL=/path/to/Qwen3-8B` before launching the Gradio demo.
+
 ## Check The Local Base Model
 
 The package does not include the full base model weights. By default both training and inference expect:
@@ -67,7 +95,8 @@ Check whether that path already exists on your machine:
 python -c "from pathlib import Path; p = Path('models/Qwen3-8B'); print(p.resolve()); print('exists =', p.exists())"
 ```
 
-If the command prints `exists = False`, place the base model there or override the path with `--base-model`.
+If the command prints `exists = False`, run `bash scripts/setup/download_base_model.sh`
+or override the path with `--base-model`.
 
 ## Reproduce The Packaged LoRA Run
 
@@ -171,26 +200,36 @@ python -B scripts/inference/predict.py \
 
 ## Launch Gradio
 
-Launch the Gradio UI with the retained LoRA adapter:
+Launch the Gradio UI:
 
 ```bash
 python -B scripts/gradio/app.py \
-  --config configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml \
-  --server-name 127.0.0.1 \
-  --server-port 7860
+  --host 127.0.0.1 \
+  --port 7860
 ```
 
-Launch the Gradio UI with the base model only:
+What the Echo Gradio UI does:
+
+- `Base only (Qwen3-8B)` loads `configs/infer_gradio_base.yaml`
+- `+ LoRA (repo adapter)` loads `configs/infer_gradio_balanced_e3.yaml`
+- The demo auto-loads the selected preset on page open
+
+If port `7860` is busy, the demo tries the next free port up to `--port-retries`.
+
+Create a temporary Gradio public link:
 
 ```bash
 python -B scripts/gradio/app.py \
-  --config configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml \
-  --disable-adapter \
-  --server-name 127.0.0.1 \
-  --server-port 7860
+  --host 127.0.0.1 \
+  --port 7860 \
+  --share
 ```
 
-If the base model is stored elsewhere, append `--base-model /path/to/your/model`.
+If the base model is stored elsewhere, export:
+
+```bash
+export COMP6713_BASE_MODEL=/path/to/Qwen3-8B
+```
 
 ## Git LFS For `*.safetensors`
 

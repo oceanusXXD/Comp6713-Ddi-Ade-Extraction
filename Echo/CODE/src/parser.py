@@ -285,6 +285,11 @@ def _relation_set(relations: Sequence[Dict[str, Any]]) -> set[Tuple[str, str, st
     return relation_set
 
 
+def relation_set(relations: Sequence[Dict[str, Any]]) -> set[Tuple[str, str, str]]:
+    """Public wrapper for relation-set comparison used by the Gradio demo."""
+    return _relation_set(relations)
+
+
 def evaluate_prediction_rows(rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     """Aggregate parse and extraction metrics over prediction rows."""
 

@@ -6,6 +6,8 @@ This folder contains the canonical configuration files for the submission packag
 
 - `qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml`: main training config
 - `infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml`: matching inference config for the retained adapter
+- `infer_gradio_base.yaml`: base-only Gradio demo config
+- `infer_gradio_balanced_e3.yaml`: Gradio demo config with the retained adapter
 
 ## Main Paths
 
@@ -23,9 +25,15 @@ Inference config:
 - input split: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
 - output predictions: `results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl`
 
+Gradio demo configs:
+
+- base demo: `configs/infer_gradio_base.yaml`
+- LoRA demo: `configs/infer_gradio_balanced_e3.yaml`
+
 ## Usage
 
 - `scripts/train/train_finetune.py` reads the training config.
 - `scripts/inference/predict.py` reads the inference config.
+- `scripts/gradio/app.py` reads the Gradio demo configs listed above.
 
 Keep config paths and README references aligned if you move files later.
