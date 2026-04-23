@@ -14,15 +14,15 @@ This folder contains the canonical configuration files for the submission packag
 Training config:
 
 - base model: `models/Qwen3-8B`
-- train split: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl`
-- validation split: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
+- train split: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl`
+- validation split: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
 - output dir: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3`
 
 Inference config:
 
 - base model: `models/Qwen3-8B`
 - adapter: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter`
-- input split: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
+- input split: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
 - output predictions: `results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl`
 
 Gradio demo configs:

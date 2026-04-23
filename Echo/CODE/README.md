@@ -21,8 +21,8 @@ If no valid relation exists in the input text, the output must be `[]`.
 ## Package Layout
 
 - `configs/`: canonical training and inference configs
-- `data/`: processed dataset files included in this package
-- `evaluate_datasets/`: benchmark index references and external dataset notes
+- `../MISC/data/`: processed dataset files included in this package
+- `../MISC/evaluate_datasets/`: benchmark index references and external dataset notes
 - `flash_attn/`: lightweight local compatibility layer for `apply_rotary`
 - `models/`: expected local location of the base model
 - `outputs/`: retained LoRA adapter and observability files
@@ -38,9 +38,9 @@ Use the following files as the default reproducible path for this package:
 
 - training config: `configs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml`
 - inference config: `configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml`
-- training data: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl`
-- validation data: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
-- test data: `data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_test.jsonl`
+- training data: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl`
+- validation data: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
+- test data: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_test.jsonl`
 - retained adapter: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/`
 
 ## Setup
@@ -250,7 +250,7 @@ git lfs pull
 
 ## Included Artifacts
 
-- The processed `latest_raw_clean` dataset is included directly in `data/`.
+- The processed `latest_raw_clean` dataset is included directly in `../MISC/data/`.
 - The retained LoRA `final_adapter/` is included in `outputs/`.
 - Summary-only benchmark outputs are included in `results/`.
 
@@ -261,7 +261,7 @@ Large historical checkpoints and raw benchmark prediction dumps are intentionall
 1. `README.md`
 2. `models/README.md`
 3. `configs/README.md`
-4. `data/README.md`
+4. `../MISC/data/README.md`
 5. `outputs/README.md`
 6. `results/README.md`
 7. `reports/RUN_RESULTS.md`

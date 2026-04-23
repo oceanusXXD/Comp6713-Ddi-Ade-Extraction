@@ -16,7 +16,7 @@ python -c "from pathlib import Path; p = Path('models/Qwen3-8B'); print(p.resolv
 
 You can either:
 
-- place the model in the path above, or
+- place the model in the path above, you can follow the guide in "CODE\README.md" to download the Qwen3-8B model.
 - override it on the CLI with `--base-model /path/to/model`
 
 Base-only inference can be run with:

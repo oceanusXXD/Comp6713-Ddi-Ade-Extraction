@@ -14,7 +14,7 @@ model:
 
 data:
   split: validation
-  input_path: data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl
+  input_path: ../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl
   max_samples: null
 
 inference:

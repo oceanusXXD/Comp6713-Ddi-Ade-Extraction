@@ -31,7 +31,7 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
     },
     "data": {
         "split": "dev",
-        "input_path": "data/merged_chatml_validation.jsonl",
+        "input_path": "../MISC/data/merged_chatml_validation.jsonl",
         "max_samples": None,
     },
     "inference": {

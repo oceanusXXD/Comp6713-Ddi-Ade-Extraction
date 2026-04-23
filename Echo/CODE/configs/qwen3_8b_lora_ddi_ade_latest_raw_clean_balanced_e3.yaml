@@ -7,8 +7,8 @@ torch_dtype: float32
 attn_implementation: sdpa
 enable_thinking: false
 system_prompt_path: prompts/medical_relation_extraction_system_prompt.txt
-train_path: data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl
-validation_path: data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl
+train_path: ../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl
+validation_path: ../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl
 max_seq_length: 4096
 finetune_type: lora
 load_in_4bit: false
