@@ -1,10 +1,10 @@
-"""推理后端适配层。
+"""Inference-backend adapter layer.
 
-这个模块把仓库的推理逻辑抽象成两种后端：
-- `transformers`：标准 Hugging Face 逐批生成
-- `vllm`：高吞吐推理路径
+This module abstracts the repository's inference flow into two backends:
+- `transformers`: standard Hugging Face batched generation
+- `vllm`: higher-throughput inference
 
-无论走哪种后端，最终都会产出统一结构的 prediction row。
+Both backends produce the same normalized prediction-row structure.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def resolve_tokenizer_source(model_config: Dict[str, Any]) -> str:
-    """决定 tokenizer 应该优先从 adapter 还是 base model 路径加载。"""
+    """Choose whether the tokenizer should come from the adapter or base model path."""
     tokenizer_source = model_config.get("tokenizer_name_or_path")
     if tokenizer_source is not None:
         return str(tokenizer_source)
@@ -44,7 +44,7 @@ def resolve_tokenizer_source(model_config: Dict[str, Any]) -> str:
 
 
 def load_model_and_tokenizer_transformers(config: Dict[str, Any]):
-    """加载 transformers 推理后端所需的 model 与 tokenizer。"""
+    """Load the model and tokenizer required by the transformers backend."""
     model_config = config["model"]
     adapter_path = model_config.get("adapter_path")
     tokenizer_source = resolve_tokenizer_source(model_config)
@@ -106,7 +106,7 @@ def load_model_and_tokenizer_transformers(config: Dict[str, Any]):
 
 
 def ensure_local_vllm_import(vllm_module: Any) -> None:
-    """确保导入到的是当前虚拟环境里的 vLLM，而不是系统残留版本。"""
+    """Ensure vLLM was imported from the active virtualenv, not a stray system install."""
     module_path = Path(vllm_module.__file__).resolve()
     venv_prefix = Path(sys.prefix).resolve()
     if not str(module_path).startswith(str(venv_prefix)):
@@ -118,7 +118,7 @@ def ensure_local_vllm_import(vllm_module: Any) -> None:
 
 @contextmanager
 def suppress_broken_flash_attn_detection() -> Any:
-    """在导入 vLLM 时临时屏蔽本地 `flash_attn` 兼容层的探测。"""
+    """Temporarily hide the local `flash_attn` shim while importing vLLM."""
     original_find_spec = importlib.util.find_spec
 
     def patched_find_spec(name: str, package: Optional[str] = None):
@@ -134,7 +134,7 @@ def suppress_broken_flash_attn_detection() -> Any:
 
 
 def load_model_and_tokenizer_vllm(config: Dict[str, Any]):
-    """加载 vLLM 推理后端。"""
+    """Load the vLLM inference backend."""
     model_config = config["model"]
     adapter_path = model_config.get("adapter_path")
     tokenizer_source = resolve_tokenizer_source(model_config)
@@ -181,12 +181,12 @@ def load_model_and_tokenizer_vllm(config: Dict[str, Any]):
 
 
 def model_input_device(model: Any) -> torch.device:
-    """返回 transformers 模型当前主输入设备。"""
+    """Return the main input device for a transformers model."""
     return next(model.parameters()).device
 
 
 def build_prompt_text(example: DatasetExample, tokenizer: Any, enable_thinking: Optional[bool]) -> str:
-    """把一条样本组装成最终送入生成模型的 prompt 文本。"""
+    """Assemble a sample into the final prompt text fed to the generation model."""
     return apply_chat_template(
         tokenizer,
         build_messages(example.system_prompt, example.user_text),
@@ -203,7 +203,7 @@ def build_prediction_row(
     raw_output: str,
     config: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """把原始生成文本包装成统一 prediction row。"""
+    """Wrap raw generated text into the normalized prediction-row structure."""
     parsed = parse_prediction_text(raw_output)
     adapter_path = config["model"].get("adapter_path")
     return canonicalize_prediction_row(
@@ -230,7 +230,7 @@ def generate_predictions_transformers(
     examples: Sequence[DatasetExample],
     config: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
-    """使用 Hugging Face `generate` 跑批量推理。"""
+    """Run batched inference with Hugging Face `generate`."""
     inference_config = config["inference"]
     enable_thinking = config["model"].get("enable_thinking")
     device = model_input_device(model)
@@ -249,7 +249,7 @@ def generate_predictions_transformers(
         encoded = {name: tensor.to(device) for name, tensor in encoded.items()}
         prompt_lengths = encoded["attention_mask"].sum(dim=1)
 
-        # 推理参数尽量与配置文件一一对应，便于在日志和实验结果里回溯。
+        # Keep generation kwargs aligned with config fields so logs and runs are easy to trace.
         generation_kwargs: Dict[str, Any] = {
             "max_new_tokens": inference_config["max_new_tokens"],
             "do_sample": bool(inference_config.get("do_sample", False)),
@@ -282,7 +282,7 @@ def generate_predictions_vllm(
     sampling_params_class: Any,
     lora_request_class: Any,
 ) -> List[Dict[str, Any]]:
-    """使用 vLLM 跑批量推理。"""
+    """Run batched inference with vLLM."""
     inference_config = config["inference"]
     enable_thinking = config["model"].get("enable_thinking")
     adapter_path = config["model"].get("adapter_path")
@@ -335,7 +335,7 @@ def generate_predictions(
     examples: Sequence[DatasetExample],
     config: Dict[str, Any],
 ) -> List[Dict[str, Any]]:
-    """根据配置自动分发到对应推理后端。"""
+    """Dispatch to the configured inference backend."""
     backend = str(config.get("backend", "transformers")).lower()
     if backend == "vllm":
         llm, sampling_params_class, lora_request_class = model_bundle

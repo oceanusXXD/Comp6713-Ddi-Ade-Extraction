@@ -31,7 +31,7 @@ logging_steps: 20
 save_strategy: steps
 save_steps: 331
 eval_strategy: steps
-output_dir: outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3
+output_dir: ../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3
 per_device_eval_batch_size: 4
 eval_steps: 331
 save_total_limit: 3

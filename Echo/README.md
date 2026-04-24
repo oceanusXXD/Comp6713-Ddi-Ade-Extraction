@@ -5,9 +5,10 @@ COMP6713 DDI/ADE extraction project.
 ## Structure
 
 - `README.md`: top-level submission guide
-- `CODE/`: reproducible code package with data, configs, scripts, and the retained LoRA adapter
-- `REPORT/`: placeholder folder for the final written report
-- `PRESENTATION/`: placeholder folder for presentation slides
+- `CODE/`: reproducible code package with configs, scripts, and Python modules
+- `MISC/`: datasets, retained adapter assets, evaluation summaries, and reproducibility notes
+- `REPORT.pdf`: final written report
+- `PRESENTATION.pdf`: presentation slides
 - `CONTRIBUTION.md`: draft contribution statement
 
 ## What Is Included
@@ -22,7 +23,7 @@ COMP6713 DDI/ADE extraction project.
 The retained adapter is stored under:
 
 ```text
-CODE/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/
+MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/
 ```
 
 ## Before You Run Anything
@@ -43,5 +44,5 @@ Read `CODE/README.md` first for:
 
 ## Final Submission Notes
 
-- `REPORT/` and `PRESENTATION/` are intentionally empty placeholders.
+- `REPORT.pdf` and `PRESENTATION.pdf` are included at the top level.
 - Update `CONTRIBUTION.md` with the final names, zIDs, and percentages before submission.

@@ -1,12 +1,12 @@
-"""仓库主训练入口。
+"""Primary training entrypoint for the repository.
 
-这个脚本负责串起完整训练流程：
-- 读取训练配置
-- 加载 tokenizer 与模型
-- 统计数据集
-- 做 dry run 编码检查
-- 构建 Trainer 并执行训练
-- 保存最终 adapter 和观测文件
+This script wires together the full training flow:
+- load the training config
+- load the tokenizer and model
+- inspect dataset statistics
+- run a dry-run encoding check
+- build the Trainer and execute training
+- save the final adapter and observability files
 """
 
 import argparse
@@ -44,7 +44,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def unwrap_module(model):
-    """从可能被多层 wrapper 包裹的模型中拿到最内层真实模型。"""
+    """Get the innermost model from a model wrapped by one or more containers."""
     candidate = model
     while hasattr(candidate, "module"):
         candidate = candidate.module
@@ -52,10 +52,10 @@ def unwrap_module(model):
 
 
 class WeightedSamplingTrainer(Trainer):
-    """在 Hugging Face Trainer 基础上增加两类能力：
+    """Extend Hugging Face Trainer with two extra capabilities.
 
-    1. 按样本权重做加权采样。
-    2. 按样本权重和 label smoothing 自定义 loss 计算。
+    1. Weighted sampling based on per-sample weights.
+    2. Custom loss computation with sample weights and label smoothing.
     """
     def __init__(
         self,
@@ -85,7 +85,7 @@ class WeightedSamplingTrainer(Trainer):
         self.use_rslora = bool(use_rslora)
 
     def _get_train_sampler(self, train_dataset=None):
-        """在单进程训练下启用 `WeightedRandomSampler`。"""
+        """Enable `WeightedRandomSampler` for single-process training."""
         dataset = train_dataset if train_dataset is not None else self.train_dataset
         if not self.enable_weighted_sampling or dataset is None:
             return super()._get_train_sampler(train_dataset)
@@ -105,7 +105,7 @@ class WeightedSamplingTrainer(Trainer):
         )
 
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
-        """覆盖默认 loss 计算，支持样本级 loss weighting。"""
+        """Override default loss computation to support sample-level loss weights."""
         labels = inputs.pop("labels")
         loss_weights = inputs.pop("loss_weights", None)
         outputs = model(**inputs)
@@ -113,7 +113,7 @@ class WeightedSamplingTrainer(Trainer):
         if logits is None:
             raise ValueError("Model output does not contain logits; cannot compute custom training loss.")
 
-        # 这里沿用 Causal LM 的标准“右移一位”监督方式。
+        # Follow the standard causal-LM next-token supervision with a one-token shift.
         shift_logits = logits[..., :-1, :].contiguous()
         shift_labels = labels[..., 1:].contiguous()
         flat_logits = shift_logits.view(-1, shift_logits.size(-1))
@@ -130,7 +130,8 @@ class WeightedSamplingTrainer(Trainer):
         per_example_loss = (per_token_loss * valid_mask_f).sum(dim=1) / valid_mask_f.sum(dim=1).clamp_min(1.0)
 
         if self.use_sample_loss_weights and loss_weights is not None:
-            # 按样本权重聚合 loss，避免少数关键类型被大批简单样本淹没。
+            # Aggregate by sample weights so a few important cases are not drowned out
+            # by a large number of easy samples.
             normalized_weights = loss_weights.to(per_example_loss.device, dtype=per_example_loss.dtype)
             loss = (per_example_loss * normalized_weights).sum() / normalized_weights.sum().clamp_min(1e-8)
         else:
@@ -141,7 +142,7 @@ class WeightedSamplingTrainer(Trainer):
         return loss
 
     def create_optimizer(self):
-        """在默认优化器之外，额外支持 LoRA+ 和 LoRA-FA 两类 adapter 优化器。"""
+        """Support LoRA+ and LoRA-FA adapter optimizers in addition to the default one."""
         if self.optimizer is not None:
             return self.optimizer
         if self.adapter_optimizer == "default":
@@ -199,7 +200,7 @@ class WeightedSamplingTrainer(Trainer):
 
 
 def parse_args() -> argparse.Namespace:
-    """解析训练命令行参数。"""
+    """Parse training CLI arguments."""
     parser = argparse.ArgumentParser(description="Fine-tune Qwen-style chat models on ADE/DDI extraction.")
     parser.add_argument(
         "--config",
@@ -250,7 +251,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def configure_logging() -> None:
-    """初始化脚本日志格式。"""
+    """Initialize the script logging format."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -258,7 +259,7 @@ def configure_logging() -> None:
 
 
 def set_global_seed(seed: int) -> None:
-    """统一设置 Python / Torch 随机种子。"""
+    """Set Python and Torch random seeds consistently."""
     random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
@@ -266,14 +267,14 @@ def set_global_seed(seed: int) -> None:
 
 
 def resolve_resume_path(resume_from_checkpoint: Optional[str]) -> Optional[Path]:
-    """把 resume 路径解析成绝对路径。"""
+    """Resolve the resume path into an absolute path."""
     if not resume_from_checkpoint:
         return None
     return Path(resume_from_checkpoint).expanduser().resolve()
 
 
 def build_training_arguments(config):
-    """把仓库训练配置映射成 `TrainingArguments`。"""
+    """Map repository training config fields into `TrainingArguments`."""
     return TrainingArguments(
         output_dir=str(config["output_dir"]),
         per_device_train_batch_size=config["per_device_train_batch_size"],
@@ -307,7 +308,7 @@ def build_training_arguments(config):
 
 
 def log_dataset_summary(config) -> None:
-    """把训练集和验证集的基础摘要打到日志。"""
+    """Log the basic training and validation dataset summaries."""
     train_summary = summarize_chat_dataset(config["train_path"])
     LOGGER.info("Train summary: %s", train_summary)
 
@@ -318,7 +319,7 @@ def log_dataset_summary(config) -> None:
 
 
 def build_encoded_preview(config, tokenizer, system_prompt: str, dry_run_samples: int) -> None:
-    """在真正加载大模型前，先做小样本编码预览。"""
+    """Run a small encoding preview before loading the full model."""
     if dry_run_samples <= 0:
         LOGGER.info("Dry-run sample encoding skipped because --dry-run-samples=%s", dry_run_samples)
         return
@@ -359,12 +360,12 @@ def build_encoded_preview(config, tokenizer, system_prompt: str, dry_run_samples
 
 
 def observability_dir(config) -> Path:
-    """返回当前训练运行对应的 observability 目录。"""
+    """Return the observability directory for the current training run."""
     return config["output_dir"] / "observability"
 
 
 def save_dataset_statistics(config, tokenizer, system_prompt: str) -> None:
-    """把训练 / 验证集统计结果写入 observability 目录。"""
+    """Write training and validation dataset statistics into the observability directory."""
     output_dir = observability_dir(config)
     train_stats = compute_dataset_statistics(
         config["train_path"],
@@ -390,7 +391,7 @@ def save_dataset_statistics(config, tokenizer, system_prompt: str) -> None:
 
 
 def save_run_configuration(config) -> None:
-    """记录运行环境与训练配置快照。"""
+    """Record runtime-environment details and a training-config snapshot."""
     output_dir = observability_dir(config)
     write_json(output_dir / "runtime_environment.json", collect_runtime_environment())
     write_json(output_dir / "training_config_snapshot.json", config)
@@ -398,7 +399,7 @@ def save_run_configuration(config) -> None:
 
 
 def main() -> None:
-    """训练脚本主流程。"""
+    """Main training workflow."""
     configure_logging()
     args = parse_args()
     if Path(sys.prefix).resolve() != (PROJECT_ROOT / ".venv").resolve():
@@ -453,7 +454,8 @@ def main() -> None:
     max_seq_length = config["max_seq_length"]
     enable_thinking = config.get("enable_thinking")
 
-    # 训练集和验证集都在这里编码成 Trainer 可直接消费的数据结构。
+    # Encode the training and validation splits into structures the Trainer can
+    # consume directly.
     train_dataset, train_stats = build_supervised_dataset(
         config["train_path"],
         tokenizer,
@@ -496,7 +498,7 @@ def main() -> None:
         )
         LOGGER.info("Prepared validation dataset: %s", eval_stats)
 
-    # 只有在 dry run 通过后，才真正加载大模型，避免无谓地占 GPU 显存。
+    # Only load the full model after the dry run passes, to avoid wasting GPU memory.
     model, tokenizer = build_model_and_tokenizer(config, tokenizer=tokenizer)
     parameter_stats = collect_parameter_statistics(model)
     write_json(observability_dir(config) / "parameter_stats.json", parameter_stats)

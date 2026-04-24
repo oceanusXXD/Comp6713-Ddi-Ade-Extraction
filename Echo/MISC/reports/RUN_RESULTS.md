@@ -5,8 +5,8 @@ Verification performed for the cleaned `Echo/CODE` package.
 ## Structural Checks
 
 - The package contains the required top-level folders and main code subfolders.
-- The canonical train and inference configs point to files that exist inside `Echo/CODE`.
-- The retained adapter exists at `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/`.
+- The canonical train and inference configs point to files that exist inside `Echo/CODE` and `Echo/MISC`.
+- The retained adapter exists at `MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/`.
 
 ## Command Checks
 

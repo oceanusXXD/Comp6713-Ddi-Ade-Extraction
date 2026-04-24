@@ -6,7 +6,7 @@ allow_remote_model_source: true
 model:
   base_model_name_or_path: models/Qwen3-8B
   tokenizer_name_or_path: null
-  adapter_path: outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
+  adapter_path: ../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
   trust_remote_code: true
   torch_dtype: bfloat16
   attn_implementation: sdpa
@@ -14,7 +14,7 @@ model:
 
 data:
   split: test
-  input_path: ../MISC/data/merged_chatml_test.jsonl
+  input_path: ../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_test.jsonl
   max_samples: null
 
 inference:

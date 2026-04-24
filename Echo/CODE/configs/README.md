@@ -16,14 +16,14 @@ Training config:
 - base model: `models/Qwen3-8B`
 - train split: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl`
 - validation split: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
-- output dir: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3`
+- output dir: `../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3`
 
 Inference config:
 
 - base model: `models/Qwen3-8B`
-- adapter: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter`
+- adapter: `../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter`
 - input split: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
-- output predictions: `results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl`
+- output predictions: `../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl`
 
 Gradio demo configs:
 

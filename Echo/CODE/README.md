@@ -23,12 +23,12 @@ If no valid relation exists in the input text, the output must be `[]`.
 - `configs/`: canonical training and inference configs
 - `../MISC/data/`: processed dataset files included in this package
 - `../MISC/evaluate_datasets/`: benchmark index references and external dataset notes
+- `../MISC/outputs/`: retained LoRA adapter and observability files
+- `../MISC/reports/`: reproducibility notes and command history
+- `../MISC/results/`: retained summary-level evaluation outputs
 - `flash_attn/`: lightweight local compatibility layer for `apply_rotary`
 - `models/`: expected local location of the base model
-- `outputs/`: retained LoRA adapter and observability files
 - `prompts/`: shared system prompt
-- `reports/`: reproducibility notes and command history
-- `results/`: retained summary-level evaluation outputs
 - `scripts/`: train, inference, Gradio, and evaluation entrypoints
 - `src/`: core Python modules used by the main pipeline
 
@@ -41,7 +41,7 @@ Use the following files as the default reproducible path for this package:
 - training data: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl`
 - validation data: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl`
 - test data: `../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_test.jsonl`
-- retained adapter: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/`
+- retained adapter: `../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/`
 
 ## Setup
 
@@ -129,16 +129,16 @@ Run test-set inference with the retained adapter:
 python -B scripts/inference/predict.py \
   --config configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml \
   --split test \
-  --output-path results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_test_predictions.jsonl \
-  --metrics-path results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_test_metrics.txt \
-  --metrics-json-path results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_test_metrics.json
+  --output-path ../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_test_predictions.jsonl \
+  --metrics-path ../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_test_metrics.txt \
+  --metrics-json-path ../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_test_metrics.json
 ```
 
 Evaluate an existing prediction file:
 
 ```bash
 python -B scripts/evaluation/evaluate_predictions.py \
-  --predictions-path results/inference_runs/your_predictions.jsonl
+  --predictions-path ../MISC/results/inference_runs/your_predictions.jsonl
 ```
 
 Generate the compact quantitative comparison report:
@@ -157,9 +157,9 @@ Validation-set inference with the base model:
 python -B scripts/inference/predict.py \
   --config configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml \
   --disable-adapter \
-  --output-path results/inference_runs/qwen3_8b_base_validation_predictions.jsonl \
-  --metrics-path results/inference_runs/qwen3_8b_base_validation_metrics.txt \
-  --metrics-json-path results/inference_runs/qwen3_8b_base_validation_metrics.json
+  --output-path ../MISC/results/inference_runs/qwen3_8b_base_validation_predictions.jsonl \
+  --metrics-path ../MISC/results/inference_runs/qwen3_8b_base_validation_metrics.txt \
+  --metrics-json-path ../MISC/results/inference_runs/qwen3_8b_base_validation_metrics.json
 ```
 
 Single-text base inference:
@@ -195,7 +195,7 @@ To point at a different adapter directory explicitly:
 ```bash
 python -B scripts/inference/predict.py \
   --config configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml \
-  --adapter-path outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
+  --adapter-path ../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
 ```
 
 ## Launch Gradio
@@ -236,7 +236,7 @@ export COMP6713_BASE_MODEL=/path/to/Qwen3-8B
 The retained adapter contains:
 
 ```text
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/adapter_model.safetensors
+../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/adapter_model.safetensors
 ```
 
 This repository now tracks `*.safetensors` with Git LFS via `Echo/.gitattributes`.
@@ -251,8 +251,8 @@ git lfs pull
 ## Included Artifacts
 
 - The processed `latest_raw_clean` dataset is included directly in `../MISC/data/`.
-- The retained LoRA `final_adapter/` is included in `outputs/`.
-- Summary-only benchmark outputs are included in `results/`.
+- The retained LoRA `final_adapter/` is included in `../MISC/outputs/`.
+- Summary-only benchmark outputs are included in `../MISC/results/`.
 
 Large historical checkpoints and raw benchmark prediction dumps are intentionally omitted to keep the submission package manageable.
 
@@ -262,6 +262,6 @@ Large historical checkpoints and raw benchmark prediction dumps are intentionall
 2. `models/README.md`
 3. `configs/README.md`
 4. `../MISC/data/README.md`
-5. `outputs/README.md`
-6. `results/README.md`
-7. `reports/RUN_RESULTS.md`
+5. `../MISC/outputs/README.md`
+6. `../MISC/results/README.md`
+7. `../MISC/reports/RUN_RESULTS.md`

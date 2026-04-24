@@ -6,7 +6,7 @@ allow_remote_model_source: false
 model:
   base_model_name_or_path: models/Qwen3-8B
   tokenizer_name_or_path: null
-  adapter_path: outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
+  adapter_path: ../MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter
   trust_remote_code: true
   torch_dtype: bfloat16
   attn_implementation: sdpa
@@ -36,6 +36,6 @@ vllm:
   disable_log_stats: true
 
 output:
-  predictions_path: results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl
-  metrics_path: results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_metrics.txt
-  metrics_json_path: results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_metrics.json
+  predictions_path: ../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_predictions.jsonl
+  metrics_path: ../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_metrics.txt
+  metrics_json_path: ../MISC/results/inference_runs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3_validation_metrics.json

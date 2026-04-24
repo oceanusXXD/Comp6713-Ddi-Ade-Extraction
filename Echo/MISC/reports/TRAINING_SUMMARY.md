@@ -8,7 +8,7 @@ This summary describes the retained mainline run bundled with the submission pac
 - base model: `Qwen3-8B`
 - fine-tuning method: `LoRA` with `rsLoRA`
 - target modules: `all-linear`
-- adapter output: `outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter`
+- adapter output: `MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter`
 
 ## Hyperparameters
 

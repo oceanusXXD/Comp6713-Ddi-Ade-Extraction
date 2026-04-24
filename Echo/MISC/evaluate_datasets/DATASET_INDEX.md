@@ -1,27 +1,27 @@
-# 评测数据索引
+# Evaluation Dataset Index
 
-## 当前内部训练 / 验证 / 测试数据
+## Current Internal Train / Validation / Test Data
 
-- 训练数据：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train.jsonl`，共 `4924` 条
-- 验证数据：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_validation.jsonl`，共 `436` 条
-- 测试数据：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_test.jsonl`，共 `619` 条
-- 增强 sidecar：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train_augmentations.jsonl`，共 `1012` 条
-- 增强类型分布：`{"hardcase": 247, "margincase": 265, "negative": 320, "paraphrase": 180}`
+- Train set: `/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train.jsonl`, total `4924` rows
+- Validation set: `/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_validation.jsonl`, total `436` rows
+- Test set: `/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_test.jsonl`, total `619` rows
+- Augmentation sidecar: `/home/coder/data/Comp6713-Ddi-Ade-Extraction/data/processed/Comp6713-Ddi-Ade-Extraction_final_augment/merged_chatml_train_augmentations.jsonl`, total `1012` rows
+- Augmentation type distribution: `{"hardcase": 247, "margincase": 265, "negative": 320, "paraphrase": 180}`
 
-## 当前外部评测数据
+## Current External Evaluation Data
 
-- 同风格 held-out 验证集：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_validation.jsonl`，共 `436` 条
-- 同风格 held-out 测试集：`/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_test.jsonl`，共 `619` 条
+- Same-style held-out validation set: `/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_validation.jsonl`, total `436` rows
+- Same-style held-out test set: `/home/coder/data/Comp6713-Ddi-Ade-Extraction/evaluate_datasets/seen_style_core/official_held_out/merged_chatml_test.jsonl`, total `619` rows
 
-## 外部 bundle 目录
+## External Bundle Directories
 
-- `ade_transfer`：状态 `complete`
-- `ddi_transfer`：状态 `complete`
-- `general_guardrails`：状态 `complete`
-- `pharmacovigilance_cross_genre`：状态 `complete`
-- `seen_style_core`：状态 `partial`
+- `ade_transfer`: status `complete`
+- `ddi_transfer`: status `complete`
+- `general_guardrails`: status `complete`
+- `pharmacovigilance_cross_genre`: status `complete`
+- `seen_style_core`: status `partial`
 
-## 用法
+## Usage
 
-- 重新下载并整理外部评测集：`bash evaluate_datasets/download_evaluate_datasets.sh`
-- 重新生成索引：`.venv/bin/python evaluate_datasets/build_dataset_index.py`
+- Re-download and reorganize the external evaluation datasets: `bash evaluate_datasets/download_evaluate_datasets.sh`
+- Rebuild the index: `.venv/bin/python evaluate_datasets/build_dataset_index.py`

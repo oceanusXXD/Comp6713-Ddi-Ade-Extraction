@@ -1,9 +1,9 @@
-"""训练配置、模型加载和 PEFT 包装工具。
+"""Training config, model-loading, and PEFT helper utilities.
 
-这个模块主要解决三件事：
-1. 把 YAML 配置和历史配置格式统一整理成当前训练配置。
-2. 统一处理本地模型路径、远程模型开关、量化参数和 tokenizer 加载。
-3. 在需要时给基础模型套上 LoRA / QLoRA 适配器。
+This module is responsible for three main tasks:
+1. Normalize YAML configs and legacy config layouts into the current training format.
+2. Handle local model paths, remote-model switches, quantization settings, and tokenizer loading.
+3. Attach LoRA / QLoRA adapters to the base model when requested.
 """
 
 from __future__ import annotations
@@ -31,8 +31,8 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "attn_implementation": "sdpa",
     "enable_thinking": False,
     "system_prompt_path": None,
-    "train_path": "../MISC/data/merged_chatml_train.jsonl",
-    "validation_path": "../MISC/data/merged_chatml_validation.jsonl",
+    "train_path": "../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_train.jsonl",
+    "validation_path": "../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl",
     "max_seq_length": 4096,
     "finetune_type": "lora",
     "load_in_4bit": False,
@@ -54,7 +54,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "bias": "none",
     "task_type": "CAUSAL_LM",
     "modules_to_save": None,
-    "output_dir": "outputs/qwen3_8b_lora",
+    "output_dir": "../MISC/outputs/qwen3_8b_lora",
     "per_device_train_batch_size": 2,
     "per_device_eval_batch_size": 1,
     "gradient_accumulation_steps": 8,
@@ -97,7 +97,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
 
 
 def deep_merge_dict(base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
-    """递归合并配置字典，保留 base 中未被覆盖的默认值。"""
+    """Recursively merge config dictionaries while preserving base defaults."""
     merged = deepcopy(base)
     for key, value in updates.items():
         if isinstance(value, dict) and isinstance(merged.get(key), dict):
@@ -108,7 +108,7 @@ def deep_merge_dict(base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, 
 
 
 def resolve_project_path(value: Optional[str]) -> Optional[Path]:
-    """把相对仓库路径解析成绝对路径。"""
+    """Resolve a repo-relative path into an absolute path."""
     if value is None:
         return None
     path = Path(value).expanduser()
@@ -118,7 +118,7 @@ def resolve_project_path(value: Optional[str]) -> Optional[Path]:
 
 
 def try_resolve_existing_path(value: str) -> Optional[Path]:
-    """尽量把用户给的字符串解析成当前机器上真实存在的路径。"""
+    """Best-effort resolution of a user-provided path to an existing local path."""
     raw_path = Path(value).expanduser()
     candidates: list[Path] = []
     if raw_path.is_absolute():
@@ -126,9 +126,10 @@ def try_resolve_existing_path(value: str) -> Optional[Path]:
     else:
         candidates.append((PROJECT_ROOT / raw_path).resolve())
         candidates.append(raw_path.resolve())
-        # 文档约定是「仓库上一级 /models/模型名」，但实际常见把模型放在「仓库根 /models/模型名」
+        # The docs describe "../models/<name>", but in practice "repo_root/models/<name>"
+        # is also a common layout.
         candidates.append((PROJECT_ROOT / "models" / raw_path.name).resolve())
-        # 若写的是 models/Qwen3-8B（相对仓库根）
+        # If the config already uses "models/Qwen3-8B" relative to the repo root.
         if raw_path.parts and raw_path.parts[0] == "models" and len(raw_path.parts) > 1:
             candidates.append((PROJECT_ROOT.joinpath(*raw_path.parts)).resolve())
 
@@ -139,7 +140,7 @@ def try_resolve_existing_path(value: str) -> Optional[Path]:
 
 
 def _default_hf_id_if_local_qwen3_missing(normalized: str) -> Optional[str]:
-    """当配置写的是默认本地 Qwen3-8B 布局但磁盘上未找到时，返回官方 HF id 供 allow_remote 兜底。"""
+    """Return the official HF id when the default local Qwen3-8B path is missing."""
     lower = normalized.replace("\\", "/").rstrip("/")
     if lower.endswith("Qwen3-8B") or lower.endswith("models/Qwen3-8B"):
         return "Qwen/Qwen3-8B"
@@ -147,10 +148,11 @@ def _default_hf_id_if_local_qwen3_missing(normalized: str) -> Optional[str]:
 
 
 def resolve_model_source(value: Optional[str], *, allow_remote: bool = False) -> Optional[str]:
-    """解析模型来源。
+    """Resolve the configured model source.
 
-    默认仓库只允许本地路径；只有显式打开 `allow_remote_model_source`
-    时才允许保留 Hugging Face model id 这类远程来源。
+    By default the repository only allows local paths. Remote sources such as
+    Hugging Face model ids are only accepted when `allow_remote_model_source`
+    is explicitly enabled.
     """
     if value is None:
         return None
@@ -172,7 +174,7 @@ def resolve_model_source(value: Optional[str], *, allow_remote: bool = False) ->
 
 
 def validate_local_model_source(value: Optional[str], label: str, *, allow_remote: bool = False) -> None:
-    """校验模型来源是否合法。"""
+    """Validate that a model source is acceptable."""
     if value is None:
         return
     if allow_remote:
@@ -183,7 +185,7 @@ def validate_local_model_source(value: Optional[str], label: str, *, allow_remot
 
 
 def torch_dtype_from_name(dtype_name: Optional[str]) -> Optional[torch.dtype]:
-    """把配置里的字符串 dtype 转成 torch.dtype。"""
+    """Convert a string dtype from config into `torch.dtype`."""
     if dtype_name in (None, "", "auto"):
         return None
     mapping = {
@@ -197,7 +199,7 @@ def torch_dtype_from_name(dtype_name: Optional[str]) -> Optional[torch.dtype]:
 
 
 def normalize_report_to(value: Any) -> Any:
-    """把 report_to 规范成 transformers 可接受的列表格式。"""
+    """Normalize `report_to` into a list format accepted by transformers."""
     if value is None:
         return []
     if isinstance(value, str):
@@ -211,7 +213,7 @@ def normalize_report_to(value: Any) -> Any:
 
 
 def normalize_init_lora_weights(value: Any) -> Any:
-    """兼容布尔值和字符串形式的 LoRA 初始化配置。"""
+    """Accept both boolean and string forms of LoRA init configuration."""
     if value is None:
         return True
     if isinstance(value, str):
@@ -225,12 +227,13 @@ def normalize_init_lora_weights(value: Any) -> Any:
 
 
 def flatten_legacy_sections(loaded: Dict[str, Any]) -> Dict[str, Any]:
-    """把旧版分节配置展平成当前统一字段。
+    """Flatten older sectioned configs into the current unified field layout.
 
-    这个仓库经历过几轮配置重构，所以这里负责兼容：
-    - model/data/training 分节
-    - 旧版 peft 小节
-    - 早期的 qlora / lora 开关
+    This repository has gone through several config refactors, so this helper
+    preserves compatibility with:
+    - model/data/training sections
+    - older peft sections
+    - early qlora / lora toggles
     """
     config = deepcopy(loaded)
 
@@ -286,7 +289,7 @@ def flatten_legacy_sections(loaded: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def load_training_config(config_path: str | Path) -> Dict[str, Any]:
-    """读取 YAML 训练配置，补默认值、做路径解析并完成校验。"""
+    """Load a YAML training config, fill defaults, resolve paths, and validate it."""
     config_path = Path(config_path).expanduser().resolve()
     with config_path.open("r", encoding="utf-8") as handle:
         loaded = yaml.safe_load(handle) or {}
@@ -310,7 +313,7 @@ def load_training_config(config_path: str | Path) -> Dict[str, Any]:
 
 
 def validate_training_config(config: Dict[str, Any]) -> None:
-    """对训练配置做集中校验，尽量在训练前提前失败。"""
+    """Centralize training-config validation so failures happen before training starts."""
     validate_local_model_source(
         config.get("model_name_or_path"),
         "Model path",
@@ -349,7 +352,7 @@ def validate_training_config(config: Dict[str, Any]) -> None:
         raise ValueError("adapter_optimizer must be one of: default, loraplus, lorafa.")
     config["adapter_optimizer"] = adapter_optimizer
 
-    # 下面这组约束的目的，是避免“配置看起来合法，但组合起来不成立”的情况。
+    # These checks prevent configs that look valid individually but break as a combination.
     if finetune_type == "qlora" and not config["load_in_4bit"]:
         raise ValueError("finetune_type=qlora requires load_in_4bit=true.")
     if finetune_type != "qlora" and config["load_in_4bit"]:
@@ -411,7 +414,7 @@ def validate_training_config(config: Dict[str, Any]) -> None:
 
 
 def enforce_hf_offline_mode(*, allow_remote: bool) -> None:
-    """在禁远程模式下，强制 Hugging Face 走离线路径解析。"""
+    """Force Hugging Face into offline resolution when remote access is disabled."""
     if allow_remote:
         return
     os.environ["HF_HUB_OFFLINE"] = "1"
@@ -421,9 +424,10 @@ def enforce_hf_offline_mode(*, allow_remote: bool) -> None:
 
 @contextmanager
 def suppress_local_flash_attn_shadowing(*, enabled: bool):
-    """临时从 `sys.path` 中拿掉仓库根目录，避免本地兼容层误伤真实依赖。
+    """Temporarily remove the repo root from `sys.path` to avoid shadowing real deps.
 
-    只有在需要 `flash_attention_2` 这类真实第三方实现时才启用。
+    This is only enabled when a real third-party implementation such as
+    `flash_attention_2` is required.
     """
     if not enabled:
         yield
@@ -448,7 +452,7 @@ def suppress_local_flash_attn_shadowing(*, enabled: bool):
 
 
 def load_tokenizer(config: Dict[str, Any]):
-    """按训练配置加载 tokenizer，并补齐 pad token。"""
+    """Load the tokenizer from training config and ensure a pad token exists."""
     model_name_or_path = config.get("model_name_or_path") or config.get("name_or_path")
     if not model_name_or_path:
         raise KeyError("model_name_or_path")
@@ -466,7 +470,7 @@ def load_tokenizer(config: Dict[str, Any]):
 
 
 def build_quantization_config(config: Dict[str, Any]):
-    """在 QLoRA 模式下构造 bitsandbytes 量化配置。"""
+    """Build the bitsandbytes quantization config for QLoRA."""
     if not config.get("load_in_4bit", False):
         return None
 
@@ -489,7 +493,7 @@ def build_quantization_config(config: Dict[str, Any]):
 
 
 def load_model(config: Dict[str, Any]):
-    """加载基础 Causal LM 模型，并按配置应用 dtype / 量化 / attention 设置。"""
+    """Load the base causal LM and apply dtype, quantization, and attention settings."""
     enforce_hf_offline_mode(allow_remote=bool(config.get("allow_remote_model_source", False)))
     quantization_config = build_quantization_config(config)
     model_name_or_path = config["model_name_or_path"]
@@ -506,8 +510,9 @@ def load_model(config: Dict[str, Any]):
         model_kwargs["quantization_config"] = quantization_config
         model_kwargs["device_map"] = "auto"
 
-    # 某些环境里仓库内的本地 `flash_attn` 兼容层会遮蔽真实三方包，
-    # 这里在需要时临时拿掉这种遮蔽，确保 HF 能加载真实实现。
+    # In some environments the repo-local `flash_attn` compatibility layer can shadow
+    # the real third-party package. Remove that shadowing when needed so HF loads
+    # the actual implementation.
     with suppress_local_flash_attn_shadowing(
         enabled=str(config.get("attn_implementation", "")).lower() == "flash_attention_2"
     ):
@@ -518,7 +523,7 @@ def load_model(config: Dict[str, Any]):
 
 
 def apply_peft_if_requested(model: Any, config: Dict[str, Any]) -> Any:
-    """根据配置决定是否给模型套上 LoRA / QLoRA。"""
+    """Attach LoRA / QLoRA adapters when requested by config."""
     if config["finetune_type"] == "full":
         return model
 
@@ -554,7 +559,7 @@ def apply_peft_if_requested(model: Any, config: Dict[str, Any]) -> Any:
 
 
 def build_model_and_tokenizer(config: Dict[str, Any], tokenizer: Any = None):
-    """统一构建训练所需的 model 与 tokenizer。"""
+    """Build the model and tokenizer required for training."""
     if tokenizer is None:
         tokenizer = load_tokenizer(config)
     model = load_model(config)
@@ -563,7 +568,7 @@ def build_model_and_tokenizer(config: Dict[str, Any], tokenizer: Any = None):
 
 
 def save_adapter_artifacts(model: Any, tokenizer: Any, output_dir: Path) -> Path:
-    """把最终 adapter 和 tokenizer 资产写到 `final_adapter/`。"""
+    """Write the final adapter and tokenizer assets into `final_adapter/`."""
     adapter_dir = output_dir / "final_adapter"
     adapter_dir.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(adapter_dir)

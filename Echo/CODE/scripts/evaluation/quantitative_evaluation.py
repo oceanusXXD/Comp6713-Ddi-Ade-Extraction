@@ -6,11 +6,11 @@ Reads two sets of benchmark results (Base model vs. fine-tuned LoRA model)
 and generates a comparison report in plain text and Markdown formats.
 
 Usage (run from the project root):
-    python scripquantitative_evaluation.pyts/evaluation/quantitative_evaluation.py
+    python scripts/evaluation/quantitative_evaluation.py
 
 Outputs:
-    results/quantitative_report.txt  -- plain-text report (terminal-friendly)
-    results/quantitative_report.md   -- Markdown report (can be pasted into README or report)
+    ../MISC/results/quantitative_report.txt  -- plain-text report (terminal-friendly)
+    ../MISC/results/quantitative_report.md   -- Markdown report (can be pasted into README or report)
 """
 
 from __future__ import annotations
@@ -23,10 +23,11 @@ from typing import Dict, List, Optional
 # -- Path configuration -------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+MISC_ROOT = PROJECT_ROOT.parent / "MISC"
 
 # Base model benchmark results (Qwen3-8B, no fine-tuning)
 BASE_CSV = (
-    PROJECT_ROOT
+    MISC_ROOT
     / "results"
     / "benchmark_suite_latest_raw_clean_base_20260329"
     / "summary.csv"
@@ -34,13 +35,13 @@ BASE_CSV = (
 
 # LoRA model benchmark results (Qwen3-8B + rsLoRA, epoch-3, step 993)
 LORA_CSV = (
-    PROJECT_ROOT
+    MISC_ROOT
     / "results"
     / "benchmark_suite_latest_raw_clean_balanced_e3_ckpt993_20260329"
     / "summary.csv"
 )
 
-OUTPUT_DIR = PROJECT_ROOT / "results"
+OUTPUT_DIR = MISC_ROOT / "results"
 
 # -- Dataset display order and human-readable labels --------------------------
 
@@ -252,8 +253,8 @@ def main() -> None:
     (OUTPUT_DIR / "quantitative_report.txt").write_text(txt, encoding="utf-8")
     (OUTPUT_DIR / "quantitative_report.md").write_text(md, encoding="utf-8")
 
-    print(f"\nSaved -> results/quantitative_report.txt")
-    print(f"Saved -> results/quantitative_report.md")
+    print(f"\nSaved -> ../MISC/results/quantitative_report.txt")
+    print(f"Saved -> ../MISC/results/quantitative_report.md")
 
 
 if __name__ == "__main__":

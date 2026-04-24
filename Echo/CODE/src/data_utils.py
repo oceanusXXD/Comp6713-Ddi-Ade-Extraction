@@ -1,9 +1,9 @@
-"""数据读取、标签规范化和监督训练样本构造工具。
+"""Utilities for data loading, label normalization, and supervised sample building.
 
-这个模块承担三类职责：
-1. 读取 ChatML JSONL 并把 assistant 输出标准化为统一关系格式。
-2. 统计数据集分布、长度和标签信息，供训练前审计与观测使用。
-3. 把一条 ChatML 样本编码成监督微调可直接消费的 token / label 张量。
+This module handles three main responsibilities:
+1. Read ChatML JSONL files and normalize assistant outputs into a canonical relation format.
+2. Compute dataset distribution, length, and label statistics for pre-training inspection.
+3. Encode a ChatML sample into token / label tensors consumable by supervised fine-tuning.
 """
 
 import json
@@ -39,7 +39,7 @@ LABEL_NORMALIZATION = {
 
 
 def read_jsonl(path: Path) -> List[Dict[str, Any]]:
-    """逐行读取 JSONL 文件并返回字典列表。"""
+    """Read a JSONL file line by line and return a list of dict rows."""
     rows: List[Dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
@@ -50,18 +50,18 @@ def read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 
 def normalize_text(value: Any) -> str:
-    """做最轻量的文本规范化，主要用于去除多余空白。"""
+    """Apply lightweight text normalization, mainly to remove extra whitespace."""
     return " ".join(str(value).strip().split())
 
 
 def normalize_label_key(raw_label: Any) -> str:
-    """把标签统一成便于查表的 key 形式。"""
+    """Normalize a label into a lookup-friendly key format."""
     label = normalize_text(raw_label)
     return re.sub(r"[-_\s]+", "-", label).upper()
 
 
 def normalize_label(raw_label: Any) -> str:
-    """把各种历史标签别名映射到仓库内部规范标签。"""
+    """Map legacy label aliases into the repository's canonical labels."""
     canonical_key = normalize_label_key(raw_label)
     if canonical_key not in LABEL_NORMALIZATION:
         raise ValueError(f"Unsupported relation label: {raw_label!r}")
@@ -69,7 +69,7 @@ def normalize_label(raw_label: Any) -> str:
 
 
 def parse_assistant_relations(assistant_content: str) -> List[Dict[str, str]]:
-    """解析 assistant 的 JSON 字符串输出，并做字段与标签规范化。"""
+    """Parse the assistant's JSON output and normalize fields and labels."""
     parsed = json.loads(assistant_content)
     if not isinstance(parsed, list):
         raise ValueError("Assistant content must be a JSON list.")
@@ -88,7 +88,7 @@ def parse_assistant_relations(assistant_content: str) -> List[Dict[str, str]]:
 
 
 def normalize_relation_list(relations: Sequence[Dict[str, str]]) -> List[Dict[str, str]]:
-    """对关系列表做去重、清洗和稳定排序。"""
+    """Deduplicate, clean, and stably sort a relation list."""
     deduplicated: Dict[Tuple[str, str, str], Dict[str, str]] = {}
     for relation in relations:
         head = normalize_text(relation.get("head_entity", ""))
@@ -104,13 +104,13 @@ def normalize_relation_list(relations: Sequence[Dict[str, str]]) -> List[Dict[st
 
 
 def serialize_relations(relations: Sequence[Dict[str, str]]) -> str:
-    """把规范化关系列表序列化成稳定 JSON 字符串。"""
+    """Serialize normalized relations into a stable JSON string."""
     normalized = normalize_relation_list(relations)
     return json.dumps(normalized, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 
 def extract_training_example(row: Dict[str, Any], system_prompt: Optional[str] = None) -> Dict[str, Any]:
-    """从一条 ChatML 记录抽取出训练时真正需要的三段文本和 gold 关系。"""
+    """Extract the three training texts and gold relations from a ChatML row."""
     messages = row.get("messages", [])
     if not isinstance(messages, list):
         raise ValueError("Each row must contain a list under 'messages'.")
@@ -132,7 +132,7 @@ def extract_training_example(row: Dict[str, Any], system_prompt: Optional[str] =
 
 
 def summarize_chat_dataset(path: Path) -> Dict[str, Any]:
-    """统计数据集中样本数、空目标数和标签分布。"""
+    """Summarize dataset size, empty-target count, and label distribution."""
     rows = read_jsonl(path)
     label_counts: Counter[str] = Counter()
     empty_targets = 0
@@ -153,7 +153,7 @@ def summarize_chat_dataset(path: Path) -> Dict[str, Any]:
 
 
 def _safe_percentile(values: Sequence[int], percentile: float) -> int:
-    """在纯 Python 环境下计算稳健分位数，避免引入额外数值依赖。"""
+    """Compute a robust percentile in pure Python without extra numeric dependencies."""
     if not values:
         return 0
     sorted_values = sorted(values)
@@ -162,7 +162,7 @@ def _safe_percentile(values: Sequence[int], percentile: float) -> int:
 
 
 def _summarize_numeric(values: Sequence[int]) -> Dict[str, float]:
-    """把一组数值压缩成常见统计摘要，便于写入报告。"""
+    """Compress a numeric sequence into common summary statistics."""
     if not values:
         return {
             "min": 0,
@@ -203,10 +203,10 @@ def compute_dataset_statistics(
     enable_thinking: Optional[bool] = None,
     limit: Optional[int] = None,
 ) -> Dict[str, Any]:
-    """计算数据集长度、标签和 token 侧统计信息。
+    """Compute dataset length, label, and token-side statistics.
 
-    如果传入 tokenizer，这个函数还会额外统计 prompt 长度、完整样本长度，
-    以及样本是否超过训练时 `max_length`。
+    When a tokenizer is provided, this also measures prompt length, full-sample
+    length, and whether samples exceed the training `max_length`.
     """
     rows = read_jsonl(path)
     if limit is not None:
@@ -248,8 +248,8 @@ def compute_dataset_statistics(
             label_counts[relation["relation_type"]] += 1
 
         if tokenizer is not None:
-            # 这里分别统计“只有 prompt”与“prompt + assistant 目标”两种长度，
-            # 这样后面可以更容易定位是输入过长，还是目标答案本身过长。
+            # Track both "prompt only" and "prompt + assistant target" lengths so it is
+            # easier to tell whether overflow comes from the input or the target output.
             prompt_messages = build_messages(example["system_prompt"], user_text)
             full_messages = build_messages(example["system_prompt"], user_text, target_text)
             prompt_ids = apply_chat_template(
@@ -311,20 +311,21 @@ def tokenize_supervised_example(
     max_length: int,
     enable_thinking: Optional[bool],
 ) -> Optional[Dict[str, List[int]]]:
-    """把单条监督样本编码成训练输入。
+    """Encode one supervised sample into training inputs.
 
-    返回 `None` 代表该样本无法安全用于当前训练设置，最常见原因是：
-    - 编码后长度超过 `max_length`
-    - assistant 区域无法可靠定位
-    - 生成出的 label 全部被 mask 掉
+    Returning `None` means the sample cannot be used safely under the current
+    training settings. Common reasons include:
+    - encoded length exceeds `max_length`
+    - the assistant region cannot be located reliably
+    - all generated labels are masked out
     """
     full_messages = build_messages(system_prompt, user_text, target_text)
     prompt_messages = build_messages(system_prompt, user_text)
 
     if supports_assistant_tokens_mask(tokenizer):
         try:
-            # 如果 tokenizer 原生支持 assistant mask，就优先走这条路径。
-            # 这样能更精确地只监督 assistant 输出部分，避免手动估计边界。
+            # Prefer the tokenizer-native assistant mask when available. It gives
+            # more precise supervision over just the assistant output span.
             encoded = apply_chat_template(
                 tokenizer,
                 full_messages,
@@ -352,11 +353,12 @@ def tokenize_supervised_example(
                         "labels": labels,
                     }
         except Exception:
-            # 某些 tokenizer 虽然暴露了相关接口，但运行时并不稳定；
-            # 这里回退到“prompt 前缀 + assistant 尾部”差分策略。
+            # Some tokenizers expose this API but behave inconsistently at runtime.
+            # Fall back to a prompt-prefix vs assistant-tail diff strategy.
             pass
 
-    # 回退路径：先分别编码 prompt 与 full messages，再用长度差构造 labels。
+    # Fallback path: encode the prompt and full messages separately, then derive
+    # labels from their length difference.
     prompt_ids = apply_chat_template(
         tokenizer,
         prompt_messages,
@@ -393,14 +395,14 @@ def tokenize_supervised_example(
 
 @dataclass
 class DatasetBuildStats:
-    """记录数据集构造过程中最关心的几个计数指标。"""
+    """Track the key counters from dataset construction."""
     num_rows: int = 0
     num_encoded: int = 0
     num_skipped_over_max_length: int = 0
 
 
 class SupervisedChatDataset(Dataset):
-    """简单包装编码后样本，供 Hugging Face Trainer 直接读取。"""
+    """Light wrapper around encoded samples for direct Trainer consumption."""
     def __init__(self, items: List[Dict[str, List[int]]], sample_weights: Optional[List[float]] = None):
         self.items = items
         self.sample_weights = sample_weights if sample_weights is not None else [1.0] * len(items)
@@ -413,10 +415,10 @@ class SupervisedChatDataset(Dataset):
 
 
 class SupervisedDataCollator:
-    """把不同长度的监督样本 pad 成 batch。
+    """Pad variable-length supervised samples into a batch.
 
-    除了标准的 `input_ids / attention_mask / labels`，这里还会保留
-    每条样本的 `loss_weights`，供自定义 loss 计算时使用。
+    In addition to standard `input_ids / attention_mask / labels`, this also
+    keeps per-sample `loss_weights` for custom loss computation.
     """
     def __init__(self, tokenizer: Any):
         self.tokenizer = tokenizer
@@ -425,7 +427,7 @@ class SupervisedDataCollator:
             raise ValueError("Tokenizer must define a pad_token_id for batching.")
 
     def __call__(self, features: List[Dict[str, List[int]]]) -> Dict[str, torch.Tensor]:
-        """把一个 batch 的变长样本对齐到同一长度。"""
+        """Align a variable-length batch to a single padded length."""
         max_length = max(len(feature["input_ids"]) for feature in features)
         batch_input_ids = []
         batch_attention_mask = []
@@ -456,11 +458,11 @@ def compute_relation_weight(
     ddi_int_weight: float = 1.0,
     multi_relation_weight: float = 1.0,
 ) -> float:
-    """根据关系类型和样本难度启发式计算权重。
+    """Heuristically compute a weight from relation types and sample difficulty.
 
-    这里同一套逻辑同时被用于：
-    - 采样权重：决定训练时更容易抽到哪些样本
-    - loss 权重：决定不同样本对总 loss 的贡献大小
+    The same logic is used for:
+    - sampling weights: which samples are drawn more often during training
+    - loss weights: how much each sample contributes to total loss
     """
     weight = 1.0
     if not relations:
@@ -491,14 +493,14 @@ def build_supervised_dataset(
     ddi_int_loss_weight: float = 1.0,
     multi_relation_loss_weight: float = 1.0,
 ) -> Tuple[SupervisedChatDataset, DatasetBuildStats]:
-    """从 ChatML JSONL 构建监督训练数据集。
+    """Build a supervised training dataset from ChatML JSONL.
 
-    这个函数会串起：
-    - 读取原始样本
-    - 提取训练字段
-    - token 化
-    - 长度过滤
-    - 采样 / loss 权重计算
+    This function ties together:
+    - raw sample loading
+    - training-field extraction
+    - tokenization
+    - length filtering
+    - sampling / loss weight computation
     """
     rows = read_jsonl(path)
     if limit is not None:

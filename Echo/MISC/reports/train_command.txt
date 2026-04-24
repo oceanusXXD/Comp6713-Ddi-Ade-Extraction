@@ -1,4 +1,4 @@
 python -B scripts/train/train_finetune.py --config configs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml --dry-run-samples 8
 python -B scripts/train/train_finetune.py --config configs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml --do-train
 python -B scripts/inference/predict.py --config configs/infer_qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3.yaml
-python -B scripts/evaluation/evaluate_predictions.py --predictions-path results/inference_runs/your_predictions.jsonl
+python -B scripts/evaluation/evaluate_predictions.py --predictions-path ../MISC/results/inference_runs/your_predictions.jsonl

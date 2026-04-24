@@ -157,9 +157,13 @@ def configure_logging() -> None:
 def build_example_catalog(limit: int = 128) -> List[Dict[str, Any]]:
     """Build optional example list from test JSONL for quick-fill / gold display."""
     candidates = [
-        PROJECT_ROOT / "data" / "merged_chatml_test.jsonl",
-        PROJECT_ROOT / "data" / "processed" / "Comp6713-Ddi-Ade-Extraction_latest_raw_clean" / "merged_chatml_test.jsonl",
-        PROJECT_ROOT / "data" / "processed" / "Comp6713-Ddi-Ade-Extraction_final_augment" / "merged_chatml_test.jsonl",
+        PROJECT_ROOT.parent
+        / "MISC"
+        / "data"
+        / "processed"
+        / "Comp6713-Ddi-Ade-Extraction_latest_raw_clean"
+        / "merged_chatml_test.jsonl",
+        PROJECT_ROOT.parent / "MISC" / "data" / "merged_chatml_test.jsonl",
     ]
     path = next((p for p in candidates if p.exists()), candidates[0])
     if not path.exists():

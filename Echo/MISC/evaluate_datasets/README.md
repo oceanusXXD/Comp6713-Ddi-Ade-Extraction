@@ -11,5 +11,5 @@ This folder contains lightweight references for the external benchmark datasets 
 ## Notes
 
 - The raw external benchmark datasets are not bundled in this submission package.
-- Full benchmark result summaries are already included under `results/`.
+- Full benchmark result summaries are already included under `MISC/results/`.
 - If you need to rerun benchmark collection from scratch, use the dataset sources listed in the index files and place them under a local evaluation workspace before re-running the evaluation scripts.

@@ -202,7 +202,7 @@ def build_runtime_config(args: argparse.Namespace) -> Dict[str, Any]:
         config["data"]["max_samples"] = 1
         if args.output_path is None:
             config["output"]["predictions_path"] = (
-                PROJECT_ROOT / "results" / "inference_runs" / "single_text_predictions.jsonl"
+                PROJECT_ROOT.parent / "MISC" / "results" / "inference_runs" / "single_text_predictions.jsonl"
             ).resolve()
         config["output"]["metrics_path"] = None
         config["output"]["metrics_json_path"] = None

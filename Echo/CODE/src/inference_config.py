@@ -31,7 +31,7 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
     },
     "data": {
         "split": "dev",
-        "input_path": "../MISC/data/merged_chatml_validation.jsonl",
+        "input_path": "../MISC/data/processed/Comp6713-Ddi-Ade-Extraction_latest_raw_clean/merged_chatml_validation.jsonl",
         "max_samples": None,
     },
     "inference": {
@@ -53,9 +53,9 @@ DEFAULT_INFER_CONFIG: Dict[str, Any] = {
         "disable_log_stats": True,
     },
     "output": {
-        "predictions_path": "results/inference_runs/qwen3_8b_dev_predictions.jsonl",
-        "metrics_path": "results/inference_runs/qwen3_8b_dev_metrics.txt",
-        "metrics_json_path": "results/inference_runs/qwen3_8b_dev_metrics.json",
+        "predictions_path": "../MISC/results/inference_runs/qwen3_8b_dev_predictions.jsonl",
+        "metrics_path": "../MISC/results/inference_runs/qwen3_8b_dev_metrics.txt",
+        "metrics_json_path": "../MISC/results/inference_runs/qwen3_8b_dev_metrics.json",
     },
 }
 
@@ -67,7 +67,17 @@ def split_to_default_path(split: str) -> Path:
         normalized = "validation"
     if normalized not in {"validation", "test"}:
         raise ValueError("Only dev/validation/test dataset splits are supported for batch inference.")
-    return (PROJECT_ROOT / "data" / f"merged_chatml_{normalized}.jsonl").resolve()
+    candidates = [
+        PROJECT_ROOT.parent
+        / "MISC"
+        / "data"
+        / "processed"
+        / "Comp6713-Ddi-Ade-Extraction_latest_raw_clean"
+        / f"merged_chatml_{normalized}.jsonl",
+        PROJECT_ROOT.parent / "MISC" / "data" / f"merged_chatml_{normalized}.jsonl",
+    ]
+    existing = next((path for path in candidates if path.exists()), None)
+    return (existing or candidates[0]).resolve()
 
 
 def resolve_output_path(value: Optional[str]) -> Optional[Path]:

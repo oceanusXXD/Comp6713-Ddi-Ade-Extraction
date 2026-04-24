@@ -5,7 +5,7 @@ This folder stores the retained training artifact needed to reproduce inference 
 ## Included Output
 
 ```text
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/
+MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/
 ```
 
 Included subfolders:
@@ -13,18 +13,21 @@ Included subfolders:
 - `final_adapter/`: the retained LoRA adapter used by the packaged inference config
 - `observability/`: config snapshots, runtime environment details, training metrics, and dataset statistics
 
+The JSON snapshots under `observability/` are retained records from the original training machine, so
+their internal absolute paths are historical metadata rather than the packaged runtime paths.
+
 ## Retained Adapter
 
 The main packaged adapter lives at:
 
 ```text
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/
+MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/
 ```
 
 Its main weight file is:
 
 ```text
-outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/adapter_model.safetensors
+MISC/outputs/qwen3_8b_lora_ddi_ade_latest_raw_clean_balanced_e3/final_adapter/adapter_model.safetensors
 ```
 
 This repository tracks `*.safetensors` with Git LFS. After cloning, run:
